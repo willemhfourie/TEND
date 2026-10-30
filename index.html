@@ -1,0 +1,1535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tend</title>
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tend">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --paper:#ffffff; --ink:#000000; --leaf:#17663d; --leaf-ink:#ffffff; --leaf-soft:#e8f2eb;
+  --line:#dde4df; --mute:#5a645e;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  font-family:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#000000; --ink:#ffffff; --leaf:#62c48a; --leaf-ink:#000000; --leaf-soft:#0f2519;
+    --line:#27312b; --mute:#9aa59f; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#000000; --ink:#ffffff; --leaf:#62c48a; --leaf-ink:#000000; --leaf-soft:#0f2519;
+  --line:#27312b; --mute:#9aa59f; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-size:16px;line-height:1.5;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+input,select,textarea{font:inherit;color:inherit}
+img{max-width:100%}
+:focus-visible{outline:2px solid var(--leaf);outline-offset:2px;border-radius:6px}
+.app{max-width:620px;margin:0 auto;padding:16px 20px calc(104px + env(safe-area-inset-bottom,0px))}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:12px 0 20px}
+.hero{font-size:clamp(60px,18vw,104px);line-height:.86;font-weight:800;letter-spacing:-.05em;margin:0;font-variation-settings:"opsz" 96}
+.page{font-size:44px;line-height:1;font-weight:750;letter-spacing:-.035em;margin:0}
+.sub{color:var(--mute);margin:10px 0 0;font-size:15.5px;max-width:46ch}
+.iconbtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);flex:none}
+.ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:600;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.btn.leaf{background:var(--leaf);color:var(--leaf-ink)}
+.btn.small{min-height:38px;padding:0 16px;font-size:14.5px}
+.btn.wide{width:100%}
+.btn[disabled]{opacity:.4;cursor:default}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.link{color:var(--leaf);font-weight:600;font-size:14.5px;text-decoration:underline;text-underline-offset:3px}
+.sec{font-size:23px;font-weight:700;letter-spacing:-.02em;margin:34px 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec2{font-size:17px;font-weight:650;margin:22px 0 6px;color:var(--mute)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row .main{flex:1;min-width:0;display:flex;align-items:center;gap:14px}
+.row .txt{min-width:0;display:block}
+.row .t{font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .s{color:var(--mute);font-size:14px;display:block}
+.row .how{display:block;font-size:14px;margin-top:4px}
+.row.top-al{align-items:flex-start}
+.od{color:var(--ink);font-weight:650}
+.thumb{width:50px;height:50px;border-radius:50%;object-fit:cover;background:var(--leaf-soft);flex:none;display:grid;place-items:center;color:var(--leaf);font-weight:750;font-size:19px}
+.check{width:42px;height:42px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ink);display:grid;place-items:center;flex:none;color:var(--line)}
+.check:hover{color:var(--mute)}
+.check:active{background:var(--leaf);color:var(--leaf-ink);box-shadow:none}
+.x{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--mute);flex:none}
+.sp{font-family:"Instrument Serif",Georgia,"Times New Roman",serif;font-style:italic;font-size:1.1em;letter-spacing:0}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.tag{display:inline-block;font-size:13.5px;padding:3px 11px;border-radius:999px;background:var(--leaf-soft)}
+.note{background:var(--leaf-soft);border-radius:16px;padding:12px 15px;font-size:15px;margin:14px 0}
+.note.line{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.muted{color:var(--mute)}
+.small{font-size:14px}
+.pre{white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:26px 16px}
+.tile{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tile .tn{font-weight:650;font-size:17px;line-height:1.2;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .ts{color:var(--mute);font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .tx{font-size:14px;color:var(--mute);margin-top:3px}
+.tile .tx.due{color:var(--leaf);font-weight:650}
+.ringwrap{position:relative;width:100%;aspect-ratio:1;display:block}
+.ringwrap img,.ringwrap .ph{position:absolute;left:9%;top:9%;width:82%;height:82%;border-radius:50%;object-fit:cover;background:var(--leaf-soft)}
+.ringwrap .ph{display:grid;place-items:center;font-size:38px;font-weight:800;color:var(--leaf)}
+.ringwrap svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ringwrap .arc{transition:stroke-dasharray .9s cubic-bezier(.2,.7,.2,1)}
+.phero{width:min(280px,72vw);margin:4px 0 18px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20}
+.tabs .in{max-width:620px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 5px;font-size:12px;color:var(--mute);text-align:center}
+.tab[aria-current="page"]{color:var(--ink);font-weight:650}
+.tab[aria-current="page"] .ico{stroke:var(--leaf);stroke-width:2.2}
+.sheet{position:fixed;inset:0;background:var(--paper);z-index:50;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 12px) 20px calc(env(safe-area-inset-bottom,0px) + 48px)}
+.sheet[hidden]{display:none}
+.sheet .in{max-width:620px;margin:0 auto}
+.shead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;min-height:44px}
+.shead h2{margin:0;font-size:18px;font-weight:650}
+label.f{display:block;margin:16px 0}
+label.f>span,.flabel{display:block;font-size:14.5px;color:var(--mute);margin-bottom:7px}
+.field{width:100%;min-height:48px;border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--paper)}
+textarea.field{min-height:96px;resize:vertical}
+.field:focus{border-color:var(--ink);outline:none}
+.seg{display:inline-flex;flex-wrap:wrap;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);overflow:hidden}
+.seg button{padding:10px 17px;font-weight:600;font-size:15px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border:1.5px dashed var(--ink);border-radius:24px;min-height:230px;width:100%;text-align:center;padding:24px;cursor:pointer}
+.drop .big{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.shots{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.shot{position:relative}
+.shot img{width:100px;height:100px;border-radius:16px;object-fit:cover;display:block}
+.shot .x{position:absolute;top:4px;right:4px;background:var(--paper);width:30px;height:30px}
+.addshot{width:100px;height:100px;border-radius:16px;border:1.5px dashed var(--ink);display:grid;place-items:center;cursor:pointer}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days button{width:46px;height:46px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--line);font-weight:650;font-size:14px}
+.days button[aria-pressed="true"]{background:var(--leaf);box-shadow:none;color:var(--leaf-ink)}
+.plan{border-top:1px solid var(--line)}
+.prow{padding:14px 0;border-bottom:1px solid var(--line)}
+.prow .pl{font-weight:650}
+.nums{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.nums label{display:flex;align-items:center;gap:8px;font-size:14.5px;color:var(--mute)}
+.nums input{width:74px;min-height:42px;border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .wd{font-size:12.5px;color:var(--mute);padding-bottom:4px}
+.cal .d{aspect-ratio:1;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:15.5px;position:relative}
+.cal .d.care{background:var(--leaf-soft)}
+.cal .d.out{opacity:.32}
+.cal .d.today{font-weight:800}
+.cal .d.sel{box-shadow:inset 0 0 0 2px var(--ink)}
+.dots{display:flex;gap:3px;height:6px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot.water{background:var(--leaf)}
+.dot.feed{background:var(--ink)}
+.dot.other{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.dot.past{opacity:.4}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--mute);margin:12px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.monthbar{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.monthbar strong{font-size:20px;letter-spacing:-.01em}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 8px 10px 18px;border-radius:999px;font-size:14.5px;z-index:90;max-width:min(92vw,520px);display:flex;align-items:center;gap:12px}
+.toast button{color:var(--paper);font-weight:700;text-decoration:underline;padding:4px 10px}
+.toast.solo{padding-right:18px}
+.toast[hidden]{display:none}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp .8s linear infinite;flex:none}
+.busy{display:flex;align-items:center;gap:12px;margin:18px 0;font-weight:600}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}.ringwrap .arc{transition:none}}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.pgrid button{display:block}
+.pgrid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;display:block}
+.pgrid .cap{font-size:12.5px;color:var(--mute);margin-top:3px;display:block}
+.cover{box-shadow:0 0 0 2.5px var(--leaf);border-radius:12px}
+.danger{color:var(--ink);font-weight:650;text-decoration:underline;text-underline-offset:3px}
+.empty{padding:28px 0}
+.empty .page{font-size:32px}
+dl.need{margin:0;border-top:1px solid var(--line)}
+dl.need div{padding:12px 0;border-bottom:1px solid var(--line)}
+dl.need dt{font-size:14px;color:var(--mute)}
+dl.need dd{margin:2px 0 0}
+.have{color:var(--leaf);font-weight:650}
+.prio{font-size:12.5px;font-weight:650;padding:2px 9px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);white-space:nowrap}
+.prio.now{background:var(--ink);color:var(--paper)}
+.bought .t{text-decoration:line-through;color:var(--mute)}
+.wx{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 12px 12px 16px;border-radius:16px;box-shadow:inset 0 0 0 1.5px var(--line);margin:4px 0 8px;font-size:15px}
+.issue{padding:16px 0;border-bottom:1px solid var(--line)}
+.issue:first-of-type{border-top:1px solid var(--line)}
+.issue .ih{display:flex;align-items:center;gap:12px}
+.issue .t{font-weight:650;display:block}
+.issue .s{color:var(--mute);font-size:14px;display:block}
+.issue p{margin:8px 0 0}
+ul.log{list-style:none;margin:8px 0 0;padding:0;font-size:14px}
+ul.log li{padding:2px 0}
+</style>
+</head>
+<body>
+<main id="main" class="app" aria-live="polite"></main>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="in">
+    <button class="tab" data-act="nav" data-view="today"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c3 4 6 7.3 6 10.5a6 6 0 0 1-12 0c0-3.2 3-6.5 6-10.5z"/></svg>Today</button>
+    <button class="tab" data-act="nav" data-view="indoor"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/></svg>Indoor</button>
+    <button class="tab" data-act="nav" data-view="outdoor"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9.5" r="5.5"/><path d="M12 15v6M9 21h6"/></svg>Outdoor</button>
+    <button class="tab" data-act="nav" data-view="calendar"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Calendar</button>
+    <button class="tab" data-act="nav" data-view="supplies"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>Supplies</button>
+  </div>
+</nav>
+
+<section id="sheet" class="sheet" hidden role="dialog" aria-modal="true"><div class="in" id="sheetin"></div></section>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ---------- utilities ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const today = () => ymd(new Date());
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return ymd(d); };
+const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
+const dow = s => parse(s).getDay();
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const num = (x, max = 800) => Math.max(0, Math.min(max, Math.round(Number(x) || 0)));
+const str = (x, n = 300) => (typeof x === 'string' ? x : x == null ? '' : String(x)).trim().slice(0, n);
+const arr = x => Array.isArray(x) ? x : [];
+const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WDL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const LABEL = {water:'Water', feed:'Feed', treat:'Treat', clean:'Clean leaves', refresh:'Repot', prune:'Prune', mow:'Mow'};
+const GROUP = {water:'Water', feed:'Feed', treat:'Treat pests and disease', clean:'Clean leaves', mow:'Mow', prune:'Prune', refresh:'Repot and refresh'};
+const DONE = {water:'Watered', feed:'Fed', treat:'Treated', clean:'Cleaned', refresh:'Done', prune:'Pruned', mow:'Mowed'};
+const ORDER = ['water','feed','treat','clean','mow','prune','refresh'];
+const PLAN_TYPES = ['water','feed','clean','mow','prune','refresh'];
+const KINDI = {pest:'Pest', disease:'Disease', other:'Other problem'};
+const KIND = {feed:'Feed', soil:'Potting soil', pot:'Pots', other:'Other'};
+const ICON = {
+  sliders:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  cam:'<path d="M4 8h3.2l1.8-2.5h6L16.8 8H20v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  left:'<path d="M15 5l-7 7 7 7"/>',
+  right:'<path d="M9 5l7 7-7 7"/>'
+};
+const ico = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICON[n]}</svg>`;
+function fmtDay(s) {
+  const d = diffDays(today(), s);
+  if (d === 0) return 'Today';
+  if (d === 1) return 'Tomorrow';
+  if (d === -1) return 'Yesterday';
+  if (d > 1 && d < 7) return WDL[dow(s)];
+  const x = parse(s); return `${WD[x.getDay()]} ${x.getDate()} ${MON[x.getMonth()]}`;
+}
+function fmtRel(s) {
+  const d = diffDays(today(), s);
+  if (d < 0) return 'overdue';
+  if (d === 0) return 'today';
+  if (d === 1) return 'tomorrow';
+  return 'on ' + fmtDay(s);
+}
+function longDate(s) { const x = parse(s); return `${x.getDate()} ${MONL[x.getMonth()]}`; }
+const initial = p => esc((p.name || '?').trim().charAt(0).toUpperCase());
+
+/* ---------- state ---------- */
+const AI = false; // standalone build: no Claude runtime, so no AI features
+const DEFAULTS = {careDays:[3,6], reminderTime:'07:30', hemisphere:'south', climate:'', pets:false, lat:null, lon:null};
+const S = {settings:{...DEFAULTS}, plants:[], inventory:[], issues:[], rain:[], rainHold:null, autoHold:null, holdIgnored:null, wx:null, migrated:false, names:{}, me:null, canWrite:true, shopping:null, view:'today', calMonth:null, calSel:null, loaded:false, shopBusy:false, shopErr:''};
+let sheet = null;      // {kind, ...}
+let draft = null;      // add-plant draft
+let pv = null;         // plant view state
+let sup = null;        // supply draft
+let setDraft = null;   // settings draft
+let rd = null;         // rain sheet draft
+let aiCtl = null;
+
+/* ---------- storage ---------- */
+const LKEY = 'tend-garden-v1';
+const IDB = {
+  db:null,
+  open() { return new Promise((res, rej) => { const r = indexedDB.open('tend', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => { this.db = r.result; res(); }; r.onerror = () => rej(r.error); }); },
+  get(k) { return new Promise((res, rej) => { const q = this.db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  set(k, v) { return new Promise((res, rej) => { const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+};
+const clean = o => JSON.parse(JSON.stringify(o));
+// The garden lives at a shared path, so everyone the page is shared with (with edit access) sees and edits the same garden.
+const Store = {
+  mode:'local', db:null, user:null, base:'garden/main', priv:null, flags:{},
+  async init() {
+    let db = null, user = null;
+    if (window.claude && typeof window.claude.use === 'function') {
+      try { [db, user] = await Promise.all([claude.use('db'), claude.use('user')]); } catch (e) {}
+    }
+    if (db && user) {
+      try {
+        const id = await user.id();
+        if (id) {
+          this.db = db; this.user = user; S.me = id; this.priv = `data/users/${id}/garden`; this.mode = 'cloud';
+          try { S.canWrite = user.can('data.write') !== false; } catch (e) {}
+          this.subscribe(); return;
+        }
+      } catch (e) {}
+    }
+    this.mode = 'local'; await this.loadLocal(); S.loaded = true; render(); weatherSync();
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+  },
+  mark(k) {
+    this.flags[k] = true;
+    if (!S.loaded && ['g','p','i','s'].every(x => this.flags[x])) { S.loaded = true; this.migrate(); }
+    render(); loadNames();
+  },
+  subscribe() {
+    const err = () => { toast('Couldn’t load the garden. Check your connection and reopen the page.'); };
+    this.db.doc(this.base).onSnapshot(s => {
+      const d = s.data() || {};
+      S.settings = {...DEFAULTS, ...(d.settings || {})};
+      S.shopping = d.shopping || null; S.rain = arr(d.rain); S.rainHold = d.rainHold || null; S.migrated = !!d.migrated;
+      this.mark('g');
+    }, err);
+    this.db.collection(this.base + '/plants').onSnapshot(q => { S.plants = q.docs.map(x => ({...x.data(), id:x.id})); this.mark('p'); }, err);
+    this.db.collection(this.base + '/inventory').onSnapshot(q => { S.inventory = q.docs.map(x => ({...x.data(), id:x.id})); this.mark('i'); }, err);
+    this.db.collection(this.base + '/issues').onSnapshot(q => { S.issues = q.docs.map(x => ({...x.data(), id:x.id})); this.mark('s'); }, err);
+  },
+  // One-time move of a garden saved privately by the first version into the shared garden.
+  async migrate() {
+    if (S.migrated || S.plants.length || !S.canWrite) return;
+    try {
+      const col = n => this.db.collection(`${this.priv}/${n}`);
+      const [g, pp, pi, ph] = await Promise.all([this.db.doc(this.priv).get(), col('plants').get(), col('inventory').get(), col('photos').get()]);
+      if (!pp.size && !pi.size) return;
+      for (const x of pp.docs) await this.db.collection(this.base + '/plants').doc(x.id).set(x.data());
+      for (const x of pi.docs) await this.db.collection(this.base + '/inventory').doc(x.id).set(x.data());
+      for (const x of ph.docs) await this.db.collection(this.base + '/photos').doc(x.id).set(x.data());
+      const d = g.exists ? (g.data() || {}) : {};
+      if (d.settings) S.settings = {...DEFAULTS, ...d.settings};
+      if (d.shopping) S.shopping = d.shopping;
+      S.migrated = true; await this.putGarden();
+      toast('Your garden moved into the shared space.');
+    } catch (e) {}
+  },
+  local:{photos:[]},
+  photosDirty:false,
+  async loadLocal() {
+    try {
+      await IDB.open();
+      const d = (await IDB.get('garden')) || {};
+      S.settings = {...DEFAULTS, ...(d.settings || {})}; S.shopping = d.shopping || null;
+      S.plants = d.plants || []; S.inventory = d.inventory || []; S.issues = d.issues || [];
+      S.rain = d.rain || []; S.rainHold = d.rainHold || null;
+      S.autoHold = d.autoHold || null; S.holdIgnored = d.holdIgnored || null; S.wx = d.wx || null;
+      this.local.photos = (await IDB.get('photos')) || [];
+    } catch (e) { toast('Couldn’t open storage on this phone. Close and reopen Tend.'); }
+  },
+  async saveLocal() {
+    try {
+      await IDB.set('garden', clean({settings:S.settings, shopping:S.shopping, plants:S.plants, inventory:S.inventory, issues:S.issues, rain:S.rain, rainHold:S.rainHold, autoHold:S.autoHold, holdIgnored:S.holdIgnored, wx:S.wx}));
+      if (this.photosDirty) { this.photosDirty = false; await IDB.set('photos', this.local.photos); }
+    } catch (e) { toast('This phone is out of space. Remove a few photos.'); }
+  },
+  upsert(list, item) { const i = list.findIndex(x => x.id === item.id); if (i >= 0) list[i] = item; else list.push(item); },
+  async putPlant(p) {
+    p.updatedAt = Date.now(); this.upsert(S.plants, p); render();
+    if (this.mode === 'cloud') { const {id, ...data} = p; await this.db.collection(this.base + '/plants').doc(id).set(clean(data)); }
+    else await this.saveLocal();
+  },
+  async delPlant(id) {
+    const iss = S.issues.filter(i => i.plantId === id);
+    S.plants = S.plants.filter(p => p.id !== id); S.issues = S.issues.filter(i => i.plantId !== id); render();
+    if (this.mode === 'cloud') {
+      await this.db.collection(this.base + '/plants').doc(id).delete();
+      for (const i of iss) await this.db.collection(this.base + '/issues').doc(i.id).delete();
+      const ph = await this.photosFor(id);
+      for (const x of ph) await this.db.collection(this.base + '/photos').doc(x.id).delete();
+    } else { this.local.photos = this.local.photos.filter(x => x.plantId !== id); this.photosDirty = true; await this.saveLocal(); }
+  },
+  async putIssue(it) {
+    it.updatedAt = Date.now(); this.upsert(S.issues, it); render();
+    if (this.mode === 'cloud') { const {id, ...data} = it; await this.db.collection(this.base + '/issues').doc(id).set(clean(data)); }
+    else await this.saveLocal();
+  },
+  async delIssue(id) {
+    S.issues = S.issues.filter(x => x.id !== id); render();
+    if (this.mode === 'cloud') await this.db.collection(this.base + '/issues').doc(id).delete();
+    else await this.saveLocal();
+  },
+  async putInv(it) {
+    it.updatedAt = Date.now(); this.upsert(S.inventory, it); render();
+    if (this.mode === 'cloud') { const {id, ...data} = it; await this.db.collection(this.base + '/inventory').doc(id).set(clean(data)); }
+    else await this.saveLocal();
+  },
+  async delInv(id) {
+    S.inventory = S.inventory.filter(x => x.id !== id); S.invChangedAt = Date.now(); render();
+    if (this.mode === 'cloud') await this.db.collection(this.base + '/inventory').doc(id).delete();
+    else await this.saveLocal();
+  },
+  async putGarden() {
+    render();
+    if (this.mode === 'cloud') await this.db.doc(this.base).set(clean({settings:S.settings, shopping:S.shopping, rain:S.rain, rainHold:S.rainHold, migrated:S.migrated}));
+    else await this.saveLocal();
+  },
+  async addPhoto(ph) {
+    if (this.mode === 'cloud') { const {id, ...data} = ph; await this.db.collection(this.base + '/photos').doc(id).set(data); }
+    else { this.local.photos = this.local.photos.filter(x => x.id !== ph.id); this.local.photos.push(ph); this.photosDirty = true; await this.saveLocal(); }
+  },
+  async delPhoto(id) {
+    if (this.mode === 'cloud') await this.db.collection(this.base + '/photos').doc(id).delete();
+    else { this.local.photos = this.local.photos.filter(x => x.id !== id); this.photosDirty = true; await this.saveLocal(); }
+  },
+  async photosFor(plantId) {
+    let list;
+    if (this.mode === 'cloud') {
+      const q = await this.db.collection(this.base + '/photos').where('plantId', '==', plantId).get();
+      list = q.docs.map(x => ({...x.data(), id:x.id}));
+    } else list = this.local.photos.filter(x => x.plantId === plantId);
+    return list.sort((a, b) => (b.takenAt || 0) - (a.takenAt || 0));
+  }
+};
+let namesBusy = false;
+async function loadNames() {
+  const u = Store.user; if (!u || namesBusy) return;
+  const ids = new Set();
+  S.plants.forEach(p => arr(p.history).forEach(h => h.by && ids.add(h.by)));
+  S.rain.forEach(r => r.by && ids.add(r.by));
+  S.issues.forEach(i => { if (i.by) ids.add(i.by); arr(i.log).forEach(l => l.by && ids.add(l.by)); });
+  const need = [...ids].filter(id => id !== S.me && !(id in S.names));
+  if (!need.length) return;
+  namesBusy = true;
+  try { const ps = await u.profiles(need); need.forEach(id => { S.names[id] = (ps && ps[id] && ps[id].name) || ''; }); render(); }
+  catch (e) {} finally { namesBusy = false; }
+}
+const byWho = id => (!id || id === S.me) ? '' : ` by ${esc((S.names[id] || '').split(' ')[0] || 'someone else')}`;
+async function save(fn, okMsg) {
+  try { await fn(); if (okMsg) toast(okMsg); }
+  catch (e) { toast(S.canWrite ? 'Couldn’t save that. Check your connection and try again.' : 'You can view this garden but not change it. Ask the owner for edit access.'); }
+}
+
+/* ---------- schedule engine ---------- */
+function careDays() { const c = S.settings.careDays; return (c && c.length) ? c : [3,6]; }
+function isCare(s) { return careDays().includes(dow(s)); }
+function nextCareOnOrAfter(s) { for (let i = 0; i < 8; i++) { const d = addDays(s, i); if (isCare(d)) return d; } return s; }
+function isWarm(s) {
+  const m = parse(s).getMonth() + 1;
+  const warmSouth = m >= 10 || m <= 3;
+  return S.settings.hemisphere === 'north' ? !warmSouth : warmSouth;
+}
+function intervalAt(task, s) { return num(isWarm(s) ? task.warmDays : task.coolDays); }
+
+// Snap a due date onto a care day. Small early/late tolerance; short intervals get stretched
+// to the next care day (that is the batching rule), and only intervals too short to stretch get an extra day.
+function assign(due, iv, last) {
+  const lateTol = iv <= 3 ? 1 : Math.min(4, Math.floor(iv * 0.3));
+  const earlyTol = iv <= 3 ? 0 : Math.min(3, Math.floor(iv * 0.25));
+  let best = null, score = 1e9;
+  for (let k = -earlyTol; k <= lateTol; k++) {
+    const d = addDays(due, k);
+    if (last && diffDays(last, d) < 1) continue;
+    if (!isCare(d)) continue;
+    const sc = Math.abs(k) + (k > 0 ? 0.1 : 0);
+    if (sc < score) { best = d; score = sc; }
+  }
+  if (best) return {date:best};
+  // No care day close enough: take the nearer of the previous and next care day (ties go later,
+  // under-watering slightly is safer than over-watering). Too-short intervals get an extra day.
+  const nxt = nextCareOnOrAfter(due), late = diffDays(due, nxt);
+  let prev = null;
+  for (let k = 1; k < 7; k++) { const d = addDays(due, -k); if (last && diffDays(last, d) < Math.max(1, Math.ceil(iv * 0.5))) break; if (isCare(d)) { prev = d; break; } }
+  const early = prev ? diffDays(prev, due) : 99;
+  const dist = Math.min(early, late);
+  if (dist > Math.max(1, iv)) return {date:due, extra:true};
+  if (early < late) return {date:prev};
+  return {date:nxt, stretched:true};
+}
+function activeHold() {
+  const t = today();
+  const a = S.rainHold && S.rainHold.until >= t ? S.rainHold.until : null;
+  const b = S.autoHold && S.autoHold.until >= t && S.holdIgnored !== S.autoHold.until ? S.autoHold.until : null;
+  return [a, b].filter(Boolean).sort().pop() || null;
+}
+function getsRain(p) { return p.location === 'outdoor' && p.exposed !== false; }
+// Logged rain counts as watering: soaking rain resets the clock, light rain pushes it back by about half an interval.
+function rainAdjust(last, iv) {
+  let l = last, credited = false; const t = today();
+  for (const ev of [...S.rain].sort((a, b) => a.date < b.date ? -1 : 1)) {
+    if (ev.date > t || (l && ev.date <= l)) continue;
+    const c = ev.amount === 'heavy' ? ev.date : addDays(ev.date, -Math.floor(iv / 2));
+    if (!l || c > l) { l = c; credited = true; }
+  }
+  return {last:l, credited};
+}
+function cleanWd() { return careDays().reduce((a, b) => ((b + 6) % 7) > ((a + 6) % 7) ? b : a); }
+function cleanAnchor(y, m) { const wd = cleanWd(); for (let d = 1; d <= 7; d++) { const s = ymd(new Date(y, m, d)); if (dow(s) === wd) return s; } return ymd(new Date(y, m, 1)); }
+function projectTask(plant, task, end) {
+  const out = [], t = today();
+  let last = task.issue ? (task.issue.lastTreated || null) : ((plant.last || {})[task.type] || null);
+  let credited = false;
+  const rainy = task.type === 'water' && getsRain(plant);
+  if (rainy) { const r = rainAdjust(last, Math.max(1, intervalAt(task, t))); last = r.last; credited = r.credited; }
+  const ah = activeHold();
+  const hold = rainy && ah ? ah : null;
+  for (let guard = 0; guard < 400; guard++) {
+    let date, extra = false, stretched = false, iv = 0;
+    if (task.type === 'clean') {
+      // Leaf cleaning is anchored to one fixed day a month so every plant is done together.
+      const months = Math.max(1, Math.round(num(task.warmDays) / 30)); iv = months * 30;
+      if (!last) { const d = parse(t); date = cleanAnchor(d.getFullYear(), d.getMonth()); if (date < t) date = cleanAnchor(d.getFullYear(), d.getMonth() + 1); }
+      else { const d = parse(last); date = cleanAnchor(d.getFullYear(), d.getMonth() + months); }
+    }
+    else if (!last) { date = nextCareOnOrAfter(t); iv = intervalAt(task, t); }
+    else {
+      iv = intervalAt(task, last);
+      let due;
+      if (iv > 0) due = addDays(last, iv);
+      else {
+        let d = last, n = 0;
+        while (n < 370 && intervalAt(task, d) === 0) { d = addDays(d, 1); n++; }
+        if (n >= 370) return out;
+        due = d; iv = intervalAt(task, d);
+      }
+      const a = assign(due, iv, last); date = a.date; extra = !!a.extra; stretched = !!a.stretched;
+    }
+    let held = false;
+    if (hold && date <= hold) { date = nextCareOnOrAfter(addDays(hold, 1)); held = true; }
+    if (date > end) break;
+    const overdue = date < t;
+    out.push({plant, task, date: overdue ? t : date, origDate:date, overdue, extra, stretched, iv, held, credited:credited && !out.length});
+    last = overdue ? t : date;
+  }
+  return out;
+}
+function plantTasks(p) {
+  const iss = S.issues.filter(i => i.plantId === p.id && i.status !== 'resolved' && num(i.repeatDays) > 0)
+    .map(i => ({type:'treat', label:`Treat ${i.name}`, warmDays:num(i.repeatDays), coolDays:num(i.repeatDays), how:i.treatment || '', issue:i}));
+  return arr(p.tasks).concat(iss);
+}
+function projectPlant(p, end) { return plantTasks(p).flatMap(tk => projectTask(p, tk, end)); }
+function projectAll(end) { return S.plants.flatMap(p => projectPlant(p, end)); }
+function nextFor(p) { const o = projectPlant(p, addDays(today(), 400)); return o.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : ORDER.indexOf(a.task.type) - ORDER.indexOf(b.task.type))[0]; }
+
+/* ---------- AI (Claude via the page runtime) ---------- */
+let samplePromise = null, limitsCache;
+function getSample() {
+  if (!samplePromise) samplePromise = (window.claude && window.claude.use) ? claude.use('sample').catch(() => null) : Promise.resolve(null);
+  return samplePromise;
+}
+async function canImages() {
+  const s = await getSample(); if (!s) return false;
+  if (limitsCache === undefined) limitsCache = await s.limits().catch(() => null);
+  return !!(limitsCache && limitsCache.images);
+}
+function errCopy(e) {
+  switch (e && e.code) {
+    case 'not_granted': return 'Claude access is off for this page. Turn it on in the page’s permissions to use plant ID.';
+    case 'rate_limited': return 'Claude is busy or your usage limit is reached. Try again in a few minutes.';
+    case 'invalid_json': return 'The answer came back incomplete. Try again.';
+    case 'images_unavailable': return 'Photo analysis isn’t available here. Type the plant’s name and try again.';
+    case 'image_rejected': return 'That photo couldn’t be read. Try a different one.';
+    case 'prompt_too_large': return 'Too much to send at once. Try fewer photos.';
+    default: return 'Couldn’t reach Claude. Try again.';
+  }
+}
+function ctxText() {
+  const st = S.settings, t = today();
+  return [
+    `Hemisphere: ${st.hemisphere === 'north' ? 'northern (warm season April to September)' : 'southern (warm season October to March)'}.`,
+    `Today is ${t}, currently the ${isWarm(t) ? 'warm' : 'cool'} season.`,
+    st.climate ? `Climate and garden notes from the user: ${st.climate}.` : '',
+    `Pets or small children at home: ${st.pets ? 'yes' : 'no'}.`,
+    `The user only wants to do garden jobs on ${careDays().map(d => WDL[d]).join(' and ')}; the app batches tasks onto those days.`
+  ].filter(Boolean).join('\n');
+}
+function invText() {
+  return S.inventory.length
+    ? S.inventory.map(i => `- ${i.name} (${KIND[i.kind] || i.kind}${i.details ? ', ' + i.details : ''}${i.low ? ', running low' : ''})`).join('\n')
+    : '(nothing listed)';
+}
+function normPlan(r) {
+  r = r || {};
+  const tasks = [], seen = new Set();
+  for (const t of arr(r.tasks)) {
+    const type = PLAN_TYPES.includes(t && t.type) ? t.type : null;
+    if (!type || seen.has(type)) continue; seen.add(type);
+    const every = t.everyDays;
+    tasks.push({type, label:str(t.label, 30) || LABEL[type], warmDays:num(t.warmDays ?? every), coolDays:num(t.coolDays ?? every), how:str(t.how, 400)});
+  }
+  if (!seen.has('water')) tasks.push({type:'water', label:'Water', warmDays:7, coolDays:10, how:''});
+  if (!seen.has('feed')) tasks.push({type:'feed', label:'Feed', warmDays:21, coolDays:0, how:''});
+  tasks.forEach(t => { if (t.warmDays === 0 && t.coolDays === 0 && t.type === 'water') { t.warmDays = 7; t.coolDays = 10; } });
+  tasks.sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type));
+  const o = x => ({what:str(x && x.what, 200), fromSupplies:str(x && x.fromSupplies, 120) || ''});
+  return {
+    commonName:str(r.commonName, 80) || 'Unknown plant', species:str(r.species, 80),
+    confidence:['high','medium','low'].includes(r.confidence) ? r.confidence : 'medium',
+    alternatives:arr(r.alternatives).map(x => str(x, 60)).filter(Boolean).slice(0, 3),
+    category:str(r.category, 30), summary:str(r.summary, 400), light:str(r.light, 160),
+    tasks, feed:o(r.feed), soil:o(r.soil), pot:str(r.pot, 240),
+    warnings:arr(r.warnings).map(x => str(x, 200)).filter(Boolean).slice(0, 4)
+  };
+}
+function identifyPrompt(d) {
+  return `You are an experienced horticulturist building a practical home care plan.
+${d.hasImages ? 'Identify the plant in the attached photo(s).' : 'No photo is available; work from the name given.'}
+Location: ${d.loc}. Spot: ${d.spot || 'not given'}.
+${d.name ? `The user calls it: "${d.name}".` : ''}
+${d.hint ? `The user says it is: "${d.hint}". Use this unless the photo clearly contradicts it.` : ''}
+${ctxText()}
+Supplies the user already has:
+${invText()}
+
+Reply with only a JSON object in this shape:
+{"commonName":string,"species":string (botanical name),"confidence":"high"|"medium"|"low","alternatives":[up to 3 other likely plants],
+"category":"houseplant"|"succulent"|"herb"|"vegetable"|"flowering"|"shrub"|"tree"|"climber"|"lawn"|"other",
+"summary":string (max 2 practical sentences),"light":string,
+"tasks":[
+ {"type":"water","label":"Water","warmDays":int,"coolDays":int,"how":string},
+ {"type":"feed","label":"Feed","warmDays":int,"coolDays":int,"how":string},
+ {"type":"refresh","label":"Repot" or "Refresh soil" or "Mulch" or "Top-dress","everyDays":int,"how":string},
+ optional {"type":"prune","label":"Prune","warmDays":int,"coolDays":int,"how":string},
+ optional {"type":"mow","label":"Mow","warmDays":int,"coolDays":int,"how":string} (lawns only),
+ optional {"type":"clean","label":"Clean leaves","warmDays":int,"coolDays":int,"how":string} (indoor plants whose leaves collect dust, usually large or smooth leaves; omit for tiny, fuzzy or delicate leaves)
+],
+"feed":{"what":string (product type with NPK ratio),"fromSupplies":string (exact name of a listed supply that works, or "")},
+"soil":{"what":string,"fromSupplies":string or ""},
+"pot":string (size and drainage advice; "" if in the ground),
+"warnings":[up to 3 short strings: pet toxicity if relevant, common mistakes]}
+Rules: intervals are whole days for this plant in this location, realistic for a typical home. Use 0 to mean "skip in that season" (for example no feeding in the cool season, or no watering of established in-ground plants in a rainy cool season). Keep "how" to one or two short sentences.`;
+}
+function dataUrlToBlob(u) {
+  const [h, b] = u.split(','); const mime = (h.match(/data:(.*?);/) || [])[1] || 'image/jpeg';
+  const bin = atob(b); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return new Blob([a], {type:mime});
+}
+function readAsDataURL(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
+async function shrinkSrc(src, max, q) {
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+  const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+async function processPhoto(file) {
+  const src = await readAsDataURL(file);
+  const full = await shrinkSrc(src, 800, 0.74);
+  const thumb = await shrinkSrc(full, 360, 0.78);
+  return {full, thumb};
+}
+
+/* ---------- weather ---------- */
+// Past rainfall is logged automatically (5 mm+ soaking, 1-5 mm light). Forecast rain of 5 mm+ over the next 3 days holds outdoor watering.
+let wxBusy = false;
+async function weatherSync(force) {
+  const st = S.settings;
+  if (st.lat == null || st.lon == null || wxBusy || !navigator.onLine) return;
+  if (!force && S.wx && Date.now() - S.wx.at < 3 * 3600e3) return;
+  wxBusy = true;
+  try {
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${st.lat}&longitude=${st.lon}&daily=precipitation_sum&past_days=3&forecast_days=4&timezone=auto`);
+    if (!r.ok) throw new Error('weather');
+    const j = await r.json();
+    const days = j.daily.time, mm = j.daily.precipitation_sum, t = today();
+    days.forEach((d, i) => {
+      if (d >= t) return;
+      const v = mm[i] || 0, id = 'auto-' + d;
+      const amount = v >= 5 ? 'heavy' : v >= 1 ? 'light' : null;
+      S.rain = S.rain.filter(x => x.id !== id);
+      if (amount) S.rain.push({id, date:d, amount, mm:Math.round(v * 10) / 10, auto:true});
+    });
+    S.rain = S.rain.sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 40);
+    const fc = days.map((d, i) => ({d, v:mm[i] || 0})).filter(x => x.d >= t && x.d <= addDays(t, 2));
+    const total = Math.round(fc.reduce((a, x) => a + x.v, 0) * 10) / 10;
+    const wet = fc.filter(x => x.v >= 2);
+    S.wx = {at:Date.now(), total};
+    S.autoHold = total >= 5 && wet.length ? {until:wet[wet.length - 1].d, mm:total} : null;
+    await Store.putGarden();
+  } catch (e) {} finally { wxBusy = false; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') weatherSync(); });
+
+/* ---------- rendering: main views ---------- */
+function ringSVG(frac, overdue) {
+  const f = Math.max(0, Math.min(1, frac));
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="none" stroke="var(--line)" stroke-width="2.5"/>${overdue ? `<circle cx="50" cy="50" r="47" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="2 4"/>` : `<circle class="arc" cx="50" cy="50" r="47" fill="none" stroke="var(--leaf)" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="${(f * 100).toFixed(1)} 100"/>`}</svg>`;
+}
+function ringFor(p) {
+  const tk = arr(p.tasks).find(x => x.type === 'water');
+  if (!tk) return ringSVG(1, false);
+  const o = projectTask(p, tk, addDays(today(), 120))[0];
+  if (!o) return ringSVG(1, false);
+  if (o.overdue) return ringSVG(0, true);
+  const iv = o.iv || 7;
+  return ringSVG(diffDays(today(), o.date) / iv, false);
+}
+function photoBlock(p, cls = '') {
+  return `<span class="ringwrap ${cls}">${ringFor(p)}${p.thumb ? `<img src="${p.thumb}" alt="">` : `<span class="ph">${initial(p)}</span>`}</span>`;
+}
+function head(title, sub, isHero) {
+  return `<div class="top"><div><h1 class="${isHero ? 'hero' : 'page'}">${title}</h1>${sub ? `<p class="sub">${sub}</p>` : ''}</div><button class="iconbtn" data-act="settings" aria-label="Settings">${ico('sliders')}</button></div>`;
+}
+function rowHTML(o) {
+  const p = o.plant, tk = o.task, bits = [];
+  bits.push(esc(p.spot || (p.location === 'indoor' ? 'Indoor' : 'Outdoor')));
+  if (o.overdue) bits.push(`<span class="od">overdue since ${esc(fmtDay(o.origDate))}</span>`);
+  let feedLine = '';
+  if (tk.type === 'feed' && p.feed && p.feed.what) {
+    const have = supplyMatch(p.feed.fromSupplies);
+    feedLine = `<span class="how">${esc(p.feed.what)}${have ? `<br><span class="have">Use your ${esc(have.name)}</span>` : ''}</span>`;
+  }
+  if (tk.type === 'refresh' || tk.type === 'prune' || tk.type === 'treat') bits.push(esc(tk.type === 'treat' ? (tk.issue.name + (tk.issue.treatment ? ', ' + tk.issue.treatment : '')) : tk.label));
+  if (o.extra) bits.push('extra day, needs more than your care days');
+  return `<li class="row"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${bits.join(', ')}</span>${feedLine}</span></button><button class="check" data-act="done" data-id="${p.id}" data-type="${tk.type}"${tk.issue ? ` data-issue="${tk.issue.id}"` : ''} aria-label="${DONE[tk.type]} ${esc(p.name)}">${ico('check')}</button></li>`;
+}
+function renderToday() {
+  const t = today();
+  if (!S.plants.length) {
+    return head('Tend', 'Photograph a plant and Tend works out what it is, what it needs and when, then batches the jobs onto the days you choose.', true) +
+      `<div class="actions"><button class="btn" data-act="add" data-loc="indoor">${ico('cam')}Add an indoor plant</button><button class="btn ghost" data-act="add" data-loc="outdoor">Add an outdoor plant</button></div>
+       <p class="sub">Your care days are ${careDays().map(d => WDL[d]).join(' and ')}. Change them in settings.</p>`;
+  }
+  const occ = projectAll(addDays(t, 70));
+  if (!occ.length) return head('All clear', 'Nothing is scheduled in the next ten weeks.', true) + weatherBlock();
+  const hasNow = occ.some(o => o.date <= t);
+  const focus = hasNow ? t : occ.reduce((m, o) => o.date < m ? o.date : m, occ[0].date);
+  const list = occ.filter(o => o.date === focus);
+  const doneToday = S.plants.reduce((n, p) => n + arr(p.history).filter(h => h.date === t).length, 0);
+  const jobs = n => `${n} ${n === 1 ? 'job' : 'jobs'}`;
+  let html = focus === t
+    ? head('Today', `${longDate(t)}. ${jobs(list.length)}${isCare(t) ? '' : ', catching up'}.`, true)
+    : head(WDL[dow(focus)], `Next care day, ${longDate(focus)}. ${jobs(list.length)}. Nothing is due before then.`, true);
+  html += weatherBlock();
+  if (focus !== t && doneToday) html += `<p class="note">${jobs(doneToday)} done today.</p>`;
+  for (const type of ORDER) {
+    const g = list.filter(o => o.task.type === type);
+    if (!g.length) continue;
+    g.sort((a, b) => (b.overdue - a.overdue) || a.plant.name.localeCompare(b.plant.name));
+    html += `<h2 class="sec"><span>${GROUP[type]}</span>${g.length > 1 ? `<button class="link" data-act="doneall" data-type="${type}" data-date="${focus}">Mark all done</button>` : ''}</h2><ul class="rows">${g.map(rowHTML).join('')}</ul>`;
+  }
+  const after = occ.filter(o => o.date > focus);
+  if (after.length) {
+    const nd = after.reduce((m, o) => o.date < m ? o.date : m, after[0].date);
+    html += `<p class="sub" style="margin-top:28px">After that: ${esc(fmtDay(nd))}, ${jobs(after.filter(o => o.date === nd).length)}.</p>`;
+  }
+  return html;
+}
+function weatherBlock() {
+  if (!S.plants.some(getsRain)) return '';
+  const t = today(), hold = activeHold(), auto = S.settings.lat != null;
+  const recent = S.rain.filter(r => r.date <= t && diffDays(r.date, t) <= 3).sort((a, b) => a.date < b.date ? 1 : -1)[0];
+  const bits = [];
+  if (recent) bits.push(`${recent.amount === 'heavy' ? 'Soaking' : 'Light'} rain${recent.mm != null ? ` (${recent.mm} mm)` : ''} ${esc(fmtDay(recent.date).toLowerCase())}, counted as watering.`);
+  if (hold) bits.push(`Outdoor watering on hold until ${esc(fmtDay(hold).toLowerCase())}${S.autoHold && S.autoHold.until === hold && S.holdIgnored !== hold ? `, ${S.autoHold.mm} mm forecast` : ' for forecast rain'}.`);
+  const msg = bits.length ? bits.join(' ')
+    : auto ? `No real rain forecast${S.wx ? ` (${S.wx.total} mm over the next 3 days)` : ''}. Outdoor watering as normal.`
+    : 'Had rain, or expecting some? Log it, or turn on automatic weather in settings.';
+  return `<div class="wx"><span>${msg}</span><button class="btn ghost small" data-act="rainsheet">Rain</button></div>`;
+}
+function renderPlants(loc) {
+  const ps = S.plants.filter(p => p.location === loc).sort((a, b) => a.name.localeCompare(b.name));
+  const title = loc === 'indoor' ? 'Indoor' : 'Outdoor';
+  let html = `<div class="top"><div><h1 class="page">${title}</h1><p class="sub">${ps.length ? `${ps.length} ${ps.length === 1 ? 'plant' : 'plants'}. The ring shows how much time is left before the next watering.` : ''}</p></div><button class="btn small" data-act="add" data-loc="${loc}">${ico('plus')}Add</button></div>`;
+  if (!ps.length) {
+    return html + `<div class="empty"><p class="page">No ${loc} plants yet.</p><p class="sub">${loc === 'indoor' ? 'Take a photo of a pot plant to add it.' : 'Add trees, beds, pots on the patio and your lawn. A photo of each is enough.'}</p><div class="actions"><button class="btn" data-act="add" data-loc="${loc}">${ico('cam')}Take a photo</button></div></div>`;
+  }
+  const spots = [...new Set(ps.map(p => p.spot || ''))].sort((a, b) => (a === '') - (b === '') || a.localeCompare(b));
+  for (const sp of spots) {
+    const g = ps.filter(p => (p.spot || '') === sp);
+    if (spots.length > 1) html += `<h2 class="sec">${esc(sp || 'Other')}</h2>`;
+    html += `<div class="grid" style="margin-top:${spots.length > 1 ? 8 : 4}px">${g.map(tileHTML).join('')}</div>`;
+  }
+  return html;
+}
+function tileHTML(p) {
+  const n = nextFor(p), t = today();
+  const due = n && n.date <= t;
+  const act = S.issues.filter(i => i.plantId === p.id && i.status !== 'resolved');
+  return `<button class="tile" data-act="open" data-id="${p.id}">${photoBlock(p)}<span class="tn">${esc(p.name)}</span>${p.species ? `<span class="ts sp">${esc(p.species)}</span>` : ''}<span class="tx${due ? ' due' : ''}">${n ? `${esc(n.task.label)} ${n.overdue ? 'today, overdue' : fmtRel(n.date)}` : 'Nothing scheduled'}</span>${act.length ? `<span class="tx od">${act.length === 1 ? 'Problem: ' + esc(act[0].name) : act.length + ' problems'}</span>` : ''}</button>`;
+}
+function renderCalendar() {
+  const t = today();
+  const m = S.calMonth || t.slice(0, 7);
+  const [y, mo] = m.split('-').map(Number);
+  const first = ymd(new Date(y, mo - 1, 1));
+  const start = addDays(first, -((dow(first) + 6) % 7));
+  const monthEnd = ymd(new Date(y, mo, 0));
+  const end = monthEnd > addDays(t, 70) ? addDays(monthEnd, 7) : addDays(t, 70);
+  const occ = projectAll(end);
+  const by = {};
+  occ.forEach(o => (by[o.date] = by[o.date] || []).push(o));
+  const hist = {};
+  S.plants.forEach(p => arr(p.history).forEach(h => (hist[h.date] = hist[h.date] || []).push({p, h})));
+  S.issues.forEach(i => { const p = S.plants.find(x => x.id === i.plantId); if (p) arr(i.log).filter(l => l.type === 'treat').forEach(l => (hist[l.date] = hist[l.date] || []).push({p, h:{type:'treat', date:l.date, by:l.by, note:i.name}})); });
+  const rainBy = {}; S.rain.forEach(r => (rainBy[r.date] = rainBy[r.date] || []).push(r));
+  const sel = S.calSel || t;
+  const cells = [];
+  let d = start;
+  const weeks = Math.ceil((diffDays(start, monthEnd) + 1) / 7);
+  for (let i = 0; i < weeks * 7; i++, d = addDays(d, 1)) {
+    const inM = d.slice(0, 7) === m;
+    const list = d >= t ? (by[d] || []) : [];
+    const past = d < t ? (hist[d] || []) : [];
+    const types = new Set([...list.map(o => o.task.type), ...past.map(x => x.h.type)]);
+    const dots = [...types].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).slice(0, 3)
+      .map(tp => `<span class="dot ${tp === 'water' ? 'water' : tp === 'feed' ? 'feed' : 'other'}${d < t ? ' past' : ''}"></span>`).join('');
+    cells.push(`<button class="d${inM ? '' : ' out'}${isCare(d) ? ' care' : ''}${d === t ? ' today' : ''}${d === sel ? ' sel' : ''}" data-act="calday" data-date="${d}" aria-label="${esc(fmtDay(d))}${list.length ? ', ' + list.length + ' jobs' : ''}"><span>${parse(d).getDate()}</span><span class="dots">${dots}</span></button>`);
+  }
+  let html = `<div class="top"><div><h1 class="page">Calendar</h1><p class="sub">Shaded days are your care days. Jobs are batched onto them.</p></div><button class="iconbtn" data-act="settings" aria-label="Settings">${ico('sliders')}</button></div>
+  <div class="monthbar"><button class="iconbtn" data-act="calmove" data-n="-1" aria-label="Previous month">${ico('left')}</button><strong>${MONL[mo - 1]} ${y}</strong><button class="iconbtn" data-act="calmove" data-n="1" aria-label="Next month">${ico('right')}</button></div>
+  <div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w => `<span class="wd">${w}</span>`).join('')}${cells.join('')}</div>
+  <div class="legend"><span><i class="dot water"></i>Water</span><span><i class="dot feed"></i>Feed</span><span><i class="dot other"></i>Repot, prune or mow</span></div>`;
+  html += `<h2 class="sec"><span>${esc(fmtDay(sel))}</span></h2>`;
+  if (sel < t) {
+    const past = hist[sel] || [], rains = rainBy[sel] || [];
+    html += rains.map(r => `<p class="note">${r.amount === 'heavy' ? 'Soaking rain' : 'Light rain'}${byWho(r.by)}.</p>`).join('');
+    html += past.length ? `<ul class="rows">${past.map(({p, h}) => `<li class="row"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${DONE[h.type]}${h.type === 'treat' ? ' for ' + esc(h.note) : ''}${byWho(h.by)}</span></span></button></li>`).join('')}</ul>` : (rains.length ? '' : `<p class="muted">Nothing was logged.</p>`);
+  } else {
+    const list = (by[sel] || []).sort((a, b) => ORDER.indexOf(a.task.type) - ORDER.indexOf(b.task.type));
+    html += list.length ? ORDER.map(tp => { const g = list.filter(o => o.task.type === tp); return g.length ? `<h3 class="sec2" style="color:var(--ink)">${GROUP[tp]} <span class="muted" style="font-weight:500">(${g.length})</span></h3><ul class="rows">${g.map(rowHTML).join('')}</ul>` : ''; }).join('') : `<p class="muted">Nothing planned.</p>`;
+  }
+  html += `<div class="note line" style="margin-top:28px"><strong>Reminders on your phone</strong><br>Add the next eight weeks of care days to your phone’s calendar, each with an alert listing the jobs. Do it again after adding plants.<div class="actions" style="margin-bottom:0"><button class="btn small" data-act="ics">Add to phone calendar</button></div></div>`;
+  return html;
+}
+function shoppingStale() {
+  const sh = S.shopping; if (!sh) return false;
+  if (sh.count !== S.plants.length || sh.invCount !== S.inventory.length) return true;
+  return S.plants.some(p => (p.planAt || 0) > sh.at) || S.inventory.some(i => (i.updatedAt || 0) > sh.at) || (S.invChangedAt || 0) > sh.at;
+}
+function renderSupplies() {
+  let html = head('Supplies', 'What you already have, and what to pick up next time you’re at the garden centre.');
+  html += `<h2 class="sec"><span>What I have</span><button class="btn small" data-act="supply">${ico('plus')}Add</button></h2>`;
+  if (!S.inventory.length) html += `<p class="muted">Add your feeds, potting soils and spare pots. A photo of the label works. Plant plans and the shopping list then use these first.</p>`;
+  for (const k of Object.keys(KIND)) {
+    const g = S.inventory.filter(i => i.kind === k).sort((a, b) => a.name.localeCompare(b.name));
+    if (!g.length) continue;
+    html += `<h3 class="sec2">${KIND[k]}</h3><ul class="rows">${g.map(i => `<li class="row"><button class="main" data-act="supply" data-id="${i.id}"><span class="txt"><span class="t">${esc(i.name)}</span><span class="s">${esc(i.details || '')}${i.low ? `${i.details ? ', ' : ''}<span class="od">running low</span>` : ''}</span></span></button><button class="x" data-act="delsupply" data-id="${i.id}" aria-label="Remove ${esc(i.name)}">${ico('x')}</button></li>`).join('')}</ul>`;
+  }
+  html += `<h2 class="sec"><span>${AI ? 'What to get' : 'What your plants use'}</span></h2>`;
+  if (!S.plants.length) return html + `<p class="muted">Add plants first.</p>`;
+  if (!AI) return html + needsSummary();
+  if (S.shopBusy) html += `<div class="busy"><span class="spin"></span>Checking every plant against your supplies<button class="link" data-act="stop" style="margin-left:auto">Stop</button></div>`;
+  if (S.shopErr) html += `<p class="note">${esc(S.shopErr)}</p>`;
+  const sh = S.shopping;
+  if (!sh && !S.shopBusy) html += `<p class="muted">Tend compares what each plant needs with what you have, substitutes where it can, and keeps the list as short as possible.</p><div class="actions"><button class="btn" data-act="shop">Work out what I need</button></div>`;
+  if (sh) {
+    if (shoppingStale() && !S.shopBusy) html += `<p class="note">Your plants or supplies have changed since this list was made.</p>`;
+    if (arr(sh.buy).length) {
+      html += `<h3 class="sec2">Buy</h3><ul class="rows">${sh.buy.map((b, i) => `<li class="row top-al${b.bought ? ' bought' : ''}"><span class="main"><span class="txt"><span class="t" style="white-space:normal">${esc(b.item)}</span><span class="s">${esc(b.why)}${arr(b.for).length ? `. For ${esc(b.for.join(', '))}` : ''}</span>${b.bought ? `<button class="link" data-act="tosupply" data-i="${i}">Add to my supplies</button>` : ''}</span></span><span class="prio ${b.priority === 'now' ? 'now' : ''}">${b.priority === 'now' ? 'Now' : b.priority === 'soon' ? 'Soon' : 'Later'}</span><button class="check" data-act="bought" data-i="${i}" aria-pressed="${!!b.bought}" aria-label="Mark ${esc(b.item)} as bought" ${b.bought ? 'style="background:var(--leaf);color:var(--leaf-ink);box-shadow:none"' : ''}>${ico('check')}</button></li>`).join('')}</ul>`;
+    } else html += `<p class="note">Nothing to buy. What you have covers every plant.</p>`;
+    if (arr(sh.useNow).length) html += `<h3 class="sec2">Use what you have</h3><ul class="rows">${sh.useNow.map(u => `<li class="row"><span class="txt"><span class="t" style="white-space:normal">${esc(u.item)}</span><span class="s">${arr(u.for).length ? `For ${esc(u.for.join(', '))}. ` : ''}${esc(u.how)}</span></span></li>`).join('')}</ul>`;
+    if (arr(sh.tips).length) html += `<h3 class="sec2">Notes</h3><ul class="rows">${sh.tips.map(x => `<li class="row"><span class="txt small">${esc(x)}</span></li>`).join('')}</ul>`;
+    if (!S.shopBusy) html += `<p class="sub small">Made ${esc(fmtDay(ymd(new Date(sh.at))).toLowerCase())}.</p><div class="actions"><button class="btn ghost" data-act="shop">Update list</button></div>`;
+  }
+  return html;
+}
+function needsSummary() {
+  const block = (title, key) => {
+    const m = new Map();
+    S.plants.forEach(p => { const w = p[key] && p[key].what; if (w) { if (!m.has(w)) m.set(w, []); m.get(w).push(p.name); } });
+    if (!m.size) return '';
+    return `<h3 class="sec2">${title}</h3><ul class="rows">${[...m.entries()].sort((a, b) => b[1].length - a[1].length).map(([w, ns]) => { const have = supplyMatch(w); return `<li class="row"><span class="txt"><span class="t" style="white-space:normal">${esc(w)}</span><span class="s">For ${esc(ns.join(', '))}</span>${have ? `<span class="how have">You have ${esc(have.name)}</span>` : ''}</span></li>`; }).join('')}</ul>`;
+  };
+  return `<p class="muted">What each plant’s plan calls for. Most of these overlap, so one general product usually covers a whole group.</p>` + block('Feed', 'feed') + block('Soil for repotting', 'soil');
+}
+function render() {
+  const main = $('#main');
+  if (!S.loaded) main.innerHTML = `<div class="busy" style="margin-top:40px"><span class="spin"></span>Loading your garden</div>`;
+  else main.innerHTML = ({today:renderToday, indoor:() => renderPlants('indoor'), outdoor:() => renderPlants('outdoor'), calendar:renderCalendar, supplies:renderSupplies}[S.view] || renderToday)();
+  document.querySelectorAll('.tab').forEach(b => b.toggleAttribute('aria-current', false) || (b.dataset.view === S.view && b.setAttribute('aria-current', 'page')));
+  if (sheet && ((sheet.kind === 'plant' && !pv.editing && !pv.issueForm) || sheet.kind === 'rain')) renderSheet();
+}
+
+/* ---------- sheets ---------- */
+function openSheet(s) { sheet = s; renderSheet(); const el = $('#sheet'); el.hidden = false; el.scrollTop = 0; document.body.style.overflow = 'hidden'; setTimeout(() => { const h = $('#sheet h1, #sheet h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({preventScroll:true}); } }, 30); }
+function closeSheet() { if (aiCtl) aiCtl.abort(); sheet = null; draft = null; pv = null; sup = null; setDraft = null; rd = null; $('#sheet').hidden = true; document.body.style.overflow = ''; render(); }
+function renderSheet() {
+  if (!sheet) return;
+  const y = $('#sheet').scrollTop;
+  $('#sheetin').innerHTML = ({add:renderAdd, plant:renderPlantSheet, supply:renderSupply, settings:renderSettings, rain:renderRain}[sheet.kind])();
+  $('#sheet').scrollTop = y;
+}
+const closeBtn = (label = 'Close') => `<button class="iconbtn" data-act="close" aria-label="${label}">${ico('x')}</button>`;
+const seg = (key, val, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button type="button" data-act="set" data-k="${key}" data-v="${v}" aria-pressed="${String(val) === String(v)}">${l}</button>`).join('')}</div>`;
+
+/* add plant */
+function openAdd(loc) {
+  draft = {step:1, loc, exposed:'yes', name:'', spot:'', hint:'', lastWater:'unknown', lastFeed:'unknown', shots:[], busy:false, error:'', result:null};
+  openSheet({kind:'add'});
+}
+function spotList(loc) { return [...new Set(S.plants.filter(p => p.location === loc && p.spot).map(p => p.spot))]; }
+function planEditor(tasks) {
+  return `<div class="plan">${tasks.map((t, i) => `<div class="prow"><div class="pl">${esc(t.label)}</div>
+    <div class="nums">${t.type === 'refresh'
+      ? `<label>Every <input type="number" inputmode="numeric" min="1" data-tb="${i}:months" value="${Math.max(1, Math.round((t.warmDays || 365) / 30))}"> months</label>`
+      : `<label>Warm season, every <input type="number" inputmode="numeric" min="0" data-tb="${i}:warmDays" value="${t.warmDays}"> days</label><label>Cool season, every <input type="number" inputmode="numeric" min="0" data-tb="${i}:coolDays" value="${t.coolDays}"> days</label>`}</div>
+    ${t.how ? `<p class="small muted" style="margin:8px 0 0">${esc(t.how)}</p>` : ''}</div>`).join('')}</div><p class="small muted">0 means skip in that season.</p>`;
+}
+function renderAdd() {
+  const d = draft;
+  const where = d.loc === 'indoor' ? 'Room, for example Lounge or Kitchen window' : 'Area, for example Front bed, Patio or Back lawn';
+  const spots = spotList(d.loc);
+  const shotsRow = `<div class="shots">${d.shots.map((s, i) => `<span class="shot"><img src="${s.thumb}" alt="Photo ${i + 1}">${d.busy ? '' : `<button class="x" data-act="rmshot" data-i="${i}" aria-label="Remove photo">${ico('x')}</button>`}</span>`).join('')}</div>`;
+  const busyRow = msg => `<div class="busy"><span class="spin"></span>${msg}<button class="link" data-act="stop" style="margin-left:auto">Stop</button></div>`;
+  if (d.step === 1 && !AI) {
+    return `<div class="shead"><h2>New ${d.loc} plant</h2>${closeBtn()}</div>
+    <div style="margin-bottom:16px">${seg('loc', d.loc, [['indoor','Indoor'],['outdoor','Outdoor']])}</div>
+    ${d.loc === 'outdoor' ? `<div class="flabel">Does rain reach it?</div><div style="margin-bottom:16px">${seg('exposed', d.exposed, [['yes','Yes'],['no','No, it’s under cover']])}</div>` : ''}
+    <label class="drop">${ico('cam')}<span class="big">Take a photo</span><span class="muted small">Then fill in its care plan. Not sure what it is? Send the photo to Claude in a chat and ask what it is and how often to water and feed it.</span><input class="vh" type="file" accept="image/*" capture="environment" data-file="addshot"></label>
+    <p style="text-align:center"><button class="link" data-act="manual">Skip the photo</button></p>`;
+  }
+  if (d.step === 1) {
+    let body;
+    if (!d.shots.length && !d.busy) {
+      body = `<label class="drop">${ico('cam')}<span class="big">Take a photo</span><span class="muted small">Tend works out what it is and how to look after it. Get the whole plant in frame, in daylight if you can.</span><input class="vh" type="file" accept="image/*" capture="environment" data-file="addshot"></label>
+      ${d.error ? `<p class="note">${esc(d.error)}</p>` : ''}
+      ${d.typeName ? `<label class="f"><span>What is it?</span><input class="field" data-bind="hint" value="${esc(d.hint)}" placeholder="For example Kikuyu lawn or Fiddle leaf fig"></label><div class="actions"><button class="btn leaf wide" data-act="identify"${d.hint.trim() ? '' : ' disabled'}>Build care plan</button></div>`
+        : `<p style="text-align:center"><button class="link" data-act="typename">No photo? Type what it is</button></p>`}`;
+    } else {
+      body = shotsRow + (d.busy ? busyRow('Working out what it is')
+        : `${d.error ? `<p class="note">${esc(d.error)}</p>` : ''}<div class="actions"><button class="btn leaf wide" data-act="identify">Identify plant</button></div>`);
+    }
+    return `<div class="shead"><h2>New ${d.loc} plant</h2>${closeBtn()}</div>
+    <div style="margin-bottom:16px">${seg('loc', d.loc, [['indoor','Indoor'],['outdoor','Outdoor']])}</div>
+    ${d.loc === 'outdoor' ? `<div class="flabel">Does rain reach it?</div><div style="margin-bottom:16px">${seg('exposed', d.exposed, [['yes','Yes'],['no','No, it’s under cover']])}</div>` : ''}
+    ${body}
+    ${d.busy ? '' : `<p style="text-align:center"><button class="link" data-act="manual">Fill in the care plan myself</button></p>`}`;
+  }
+  const r = d.result;
+  return `<div class="shead"><button class="link" data-act="addback">Back</button>${closeBtn()}</div>
+    ${d.shots[0] ? `<img src="${d.shots[0].thumb}" alt="" class="thumb" style="width:96px;height:96px">` : ''}
+    <h1 class="page" style="margin-top:14px">${esc(d.name || r.commonName)}</h1>
+    ${r.species ? `<p class="sp" style="font-size:22px;margin:4px 0 0">${esc(r.species)}</p>` : ''}
+    ${r.manual ? '' : `<div class="tags"><span class="tag">${r.confidence === 'high' ? 'Confident match' : r.confidence === 'low' ? 'Unsure match' : 'Likely match'}</span>${r.category ? `<span class="tag">${esc(r.category)}</span>` : ''}</div>`}
+    ${r.summary ? `<p>${esc(r.summary)}</p>` : ''}
+    ${r.warnings.map(w => `<p class="note">${esc(w)}</p>`).join('')}
+    ${d.busy ? busyRow('Checking again') : ''}
+    ${d.error ? `<p class="note">${esc(d.error)}</p>` : ''}
+    ${r.manual || d.busy ? '' : `<div class="note line"><strong>${r.confidence === 'high' ? 'Not right?' : 'Not sure about this one.'}</strong> ${r.alternatives.length ? `It could also be ${r.alternatives.map(a => `<button class="link" data-act="alt" data-v="${esc(a)}">${esc(a)}</button>`).join(', ')}. Tap one to switch. ` : ''}A close-up of a leaf or flower usually settles it.<div class="actions" style="margin-bottom:0"><label class="btn ghost small" style="cursor:pointer">${ico('cam')}Add a close-up and check again<input class="vh" type="file" accept="image/*" capture="environment" data-file="reshot"></label></div></div>`}
+    <label class="f"><span>Name</span><input class="field" data-bind="name" value="${esc(d.name || (r.manual ? '' : r.commonName))}" placeholder="For example Monstera, or Big fern in the lounge"></label>
+    ${r.manual ? `<label class="f"><span>What to feed it (optional)</span><input class="field" data-bind="feedWhat" value="${esc(d.feedWhat || '')}" placeholder="For example Balanced liquid houseplant feed at half strength"></label>` : ''}
+    <label class="f"><span>${where}</span><input class="field" data-bind="spot" value="${esc(d.spot)}" list="spots">${spots.length ? `<datalist id="spots">${spots.map(s => `<option value="${esc(s)}">`).join('')}</datalist>` : ''}</label>
+    <label class="f"><span>Last watered</span><select class="field" data-bind="lastWater">${[['today','Today'],['3','A few days ago'],['7','About a week ago'],['unknown','Not sure']].map(([v, l]) => `<option value="${v}"${d.lastWater === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <label class="f"><span>Last fed</span><select class="field" data-bind="lastFeed">${[['recent','In the last couple of weeks'],['month','Over a month ago'],['unknown','Not sure']].map(([v, l]) => `<option value="${v}"${d.lastFeed === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <h2 class="sec">Care plan</h2>
+    ${planEditor(r.tasks)}
+    ${(r.feed.what || r.soil.what || r.pot) ? `<h2 class="sec">What it needs</h2><dl class="need">${r.feed.what ? `<div><dt>Feed</dt><dd>${esc(r.feed.what)}${r.feed.fromSupplies ? `<br><span class="have">Use your ${esc(r.feed.fromSupplies)}</span>` : ''}</dd></div>` : ''}${r.soil.what ? `<div><dt>Soil</dt><dd>${esc(r.soil.what)}${r.soil.fromSupplies ? `<br><span class="have">Use your ${esc(r.soil.fromSupplies)}</span>` : ''}</dd></div>` : ''}${r.pot ? `<div><dt>Pot</dt><dd>${esc(r.pot)}</dd></div>` : ''}${r.light ? `<div><dt>Light</dt><dd>${esc(r.light)}</dd></div>` : ''}</dl>` : ''}
+    ${d.busy ? '' : `<div class="actions"><button class="btn wide" data-act="saveplant">Save plant</button></div>`}`;
+}
+async function runIdentify() {
+  const d = draft; d.error = ''; d.busy = true; renderSheet();
+  const sample = await getSample();
+  if (!sample) { d.busy = false; d.error = 'Plant ID needs Claude, which isn’t available in this view. Fill in the care plan yourself, or open Tend from the Claude app.'; renderSheet(); return; }
+  const imgsOK = d.shots.length && await canImages();
+  if (d.shots.length && !imgsOK && !(d.hint.trim() || d.name.trim())) { d.busy = false; d.error = 'Photo analysis isn’t available here. Type what the plant is and try again.'; renderSheet(); return; }
+  aiCtl = new AbortController();
+  try {
+    const opts = {signal:aiCtl.signal};
+    if (imgsOK) opts.images = d.shots.map(s => dataUrlToBlob(s.full));
+    const res = await sample.json(identifyPrompt({hasImages:!!imgsOK, loc:d.loc, spot:d.spot, name:d.name, hint:d.hint}), opts);
+    if (!draft) return;
+    d.result = normPlan(res); d.step = 2;
+  } catch (e) { if (draft && e.code !== 'cancelled') d.error = errCopy(e); }
+  finally { aiCtl = null; if (draft) { d.busy = false; renderSheet(); $('#sheet').scrollTop = 0; } }
+}
+function manualPlan(name) {
+  const indoor = !draft || draft.loc === 'indoor';
+  return {manual:true, commonName:name || 'My plant', species:'', confidence:'medium', alternatives:[], category:'', summary:'', light:'',
+    tasks:[{type:'water', label:'Water', warmDays:7, coolDays:10, how:''}, {type:'feed', label:'Feed', warmDays:28, coolDays:0, how:''}].concat(indoor ? [{type:'clean', label:'Clean leaves', warmDays:30, coolDays:30, how:'Wipe leaves with a soft damp cloth.'}] : [], [{type:'refresh', label:'Repot', warmDays:730, coolDays:730, how:''}]),
+    feed:{what:'', fromSupplies:''}, soil:{what:'', fromSupplies:''}, pot:'', warnings:[]};
+}
+async function savePlant() {
+  const d = draft, r = d.result, t = today();
+  const last = {};
+  const w = {today:t, '3':addDays(t, -3), '7':addDays(t, -7)}[d.lastWater]; if (w) last.water = w;
+  const f = {recent:addDays(t, -10), month:addDays(t, -35)}[d.lastFeed]; if (f) last.feed = f;
+  last.refresh = t; last.prune = t;
+  const {manual, alternatives, ...plan} = r;
+  if (manual && d.feedWhat && d.feedWhat.trim()) plan.feed = {what:d.feedWhat.trim(), fromSupplies:''};
+  const p = {...plan, id:newId(), name:(d.name || r.commonName).trim(), location:d.loc, exposed:d.loc === 'outdoor' && d.exposed !== 'no', spot:d.spot.trim(), thumb:d.shots[0] ? d.shots[0].thumb : '', last, history:[], notes:'', createdAt:Date.now(), planAt:Date.now()};
+  const shots = d.shots.slice();
+  const loc = d.loc;
+  closeSheet(); S.view = loc; window.scrollTo(0, 0);
+  await save(async () => {
+    await Store.putPlant(p);
+    for (const s of shots) await Store.addPhoto({id:newId(), plantId:p.id, dataUrl:s.full, thumbOf:s.thumb, takenAt:Date.now()});
+  }, `${p.name} added`);
+}
+
+/* plant detail */
+function openPlant(id) { pv = {id, editing:false, issueForm:null, showResolved:false, upd:{}, tasks:null, photos:null, loadingPhotos:false, health:{text:'', answer:'', busy:false, shot:null, error:''}, del:false, notes:null, rebusy:false, reerr:''}; openSheet({kind:'plant'}); loadPhotos(); }
+async function loadPhotos() {
+  if (!pv || pv.loadingPhotos) return; pv.loadingPhotos = true;
+  try { const list = await Store.photosFor(pv.id); if (pv) { pv.photos = list; renderSheet(); } } catch (e) { if (pv) { pv.photos = []; renderSheet(); } }
+}
+function issueSection(p) {
+  const all = S.issues.filter(i => i.plantId === p.id).sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || ''));
+  const act = all.filter(i => i.status !== 'resolved'), done = all.filter(i => i.status === 'resolved');
+  let h = `<h2 class="sec"><span>Pests and diseases</span>${pv.issueForm ? '' : `<button class="link" data-act="newissue">Log a problem</button>`}</h2>`;
+  if (pv.issueForm) return h + issueFormHTML();
+  if (!all.length) h += `<p class="muted">Nothing logged. When something shows up, log it here with a repeat treatment and it lands on your care days until it’s cleared.</p>`;
+  h += act.map(i => {
+    const tk = plantTasks(p).find(x => x.issue && x.issue.id === i.id);
+    const n = tk ? projectTask(p, tk, addDays(today(), 120))[0] : null;
+    return `<div class="issue">
+      <div class="ih">${i.thumb ? `<img class="thumb" src="${i.thumb}" alt="">` : ''}<div style="flex:1;min-width:0"><span class="t">${esc(i.name)}</span><span class="s">${esc(KINDI[i.kind] || 'Problem')}, since ${esc(fmtDay(i.startedAt).toLowerCase())}${byWho(i.by)}</span></div><button class="link" data-act="editissue" data-id="${i.id}">Edit</button></div>
+      ${i.notes ? `<p class="small">${esc(i.notes)}</p>` : ''}
+      ${i.treatment ? `<p class="small">Treatment: ${esc(i.treatment)}</p>` : ''}
+      <p class="small muted">${num(i.repeatDays) ? `Repeat every ${num(i.repeatDays)} days. ${n ? (n.overdue ? 'Overdue.' : 'Next ' + esc(fmtRel(n.date)) + '.') : ''}` : 'No repeat treatment set.'}${i.lastTreated ? ` Last treated ${esc(fmtDay(i.lastTreated).toLowerCase())}.` : ''}</p>
+      ${arr(i.log).length ? `<ul class="log">${i.log.slice(0, 6).map(l => `<li><span class="muted">${esc(fmtDay(l.date))}${byWho(l.by)}:</span> ${esc(l.note)}</li>`).join('')}</ul>` : ''}
+      <div class="nums"><input class="field" style="flex:1;min-height:42px;min-width:160px" data-up="${i.id}" placeholder="Add an update, for example Spreading to new leaves" value="${esc(pv.upd[i.id] || '')}"><button class="btn ghost small" data-act="addupd" data-id="${i.id}">Add</button></div>
+      <div class="actions" style="margin-bottom:0"><button class="btn small" data-act="treated" data-id="${i.id}">Treated today</button><button class="btn ghost small" data-act="resolve" data-id="${i.id}">Mark cleared</button></div>
+    </div>`;
+  }).join('');
+  if (done.length) {
+    h += `<p><button class="link" data-act="toggleresolved">${pv.showResolved ? 'Hide' : 'Show'} ${done.length} cleared ${done.length === 1 ? 'problem' : 'problems'}</button></p>`;
+    if (pv.showResolved) h += `<ul class="rows">${done.map(i => `<li class="row"><span class="txt" style="flex:1"><span class="t">${esc(i.name)}</span><span class="s">${esc(fmtDay(i.startedAt))} to ${esc(fmtDay(i.resolvedAt || i.startedAt))}${i.treatment ? ', ' + esc(i.treatment) : ''}</span></span><button class="link" data-act="reopen" data-id="${i.id}">Reopen</button></li>`).join('')}</ul>`;
+  }
+  return h;
+}
+function issueFormHTML() {
+  const f = pv.issueForm;
+  return `<div class="issue">
+  ${seg('kind', f.kind, [['pest','Pest'],['disease','Disease'],['other','Other']])}
+  <label class="f"><span>What is it?</span><input class="field" data-bind="name" value="${esc(f.name)}" placeholder="For example Mealybug, Powdery mildew, Snails"></label>
+  <label class="f"><span>What you’re seeing (optional)</span><textarea class="field" data-bind="notes">${esc(f.notes)}</textarea></label>
+  <label class="f"><span>Treatment (optional)</span><input class="field" data-bind="treatment" value="${esc(f.treatment)}" placeholder="For example Neem oil spray, remove affected leaves"></label>
+  <div class="flabel">Repeat the treatment</div>${seg('repeatDays', String(f.repeatDays), [['0','No'],['7','Weekly'],['10','Every 10 days'],['14','Every 2 weeks']])}
+  ${f.id ? '' : `<div class="flabel" style="margin-top:16px">Treated today?</div>${seg('treatedToday', f.treatedToday, [['yes','Yes'],['no','Not yet']])}`}
+  <div class="actions">${f.thumb ? `<span class="shot"><img src="${f.thumb}" alt="" style="width:64px;height:64px"><button class="x" data-act="rmishot" aria-label="Remove photo">${ico('x')}</button></span>` : `<label class="btn ghost small" style="cursor:pointer">${ico('cam')}Add a photo<input class="vh" type="file" accept="image/*" capture="environment" data-file="issueshot"></label>`}</div>
+  ${f.error ? `<p class="note">${esc(f.error)}</p>` : ''}
+  <div class="actions"><button class="btn" data-act="saveissue">${f.id ? 'Save changes' : 'Log problem'}</button><button class="btn ghost" data-act="cancelissue">Cancel</button></div>
+  ${f.id ? `<p><button class="danger" data-act="delissue">${f.del ? 'Tap again to delete this problem' : 'Delete problem'}</button></p>` : ''}</div>`;
+}
+function cadence(tk) {
+  if (tk.type === 'refresh') return `Every ${Math.max(1, Math.round(tk.warmDays / 30))} months`;
+  if (tk.type === 'clean') { const m = Math.max(1, Math.round(num(tk.warmDays) / 30)); return m === 1 ? `First ${WDL[cleanWd()]} of every month` : `First ${WDL[cleanWd()]} of every ${m === 2 ? 'second' : m + 'th'} month`; }
+  const w = tk.warmDays, c = tk.coolDays, warm = isWarm(today());
+  if (w === c) return `Every ${w} days`;
+  const ws = w ? `every ${w} days` : 'paused', cs = c ? `every ${c} days` : 'paused';
+  return warm ? `Now ${ws} (warm season), ${cs} in the cool season` : `Now ${cs} (cool season), ${ws} in the warm season`;
+}
+function supplyMatch(name) {
+  if (!name) return null; const n = name.toLowerCase();
+  return S.inventory.find(i => i.name && (i.name.toLowerCase().includes(n) || n.includes(i.name.toLowerCase())));
+}
+function renderPlantSheet() {
+  const p = S.plants.find(x => x.id === pv.id);
+  if (!p) return `<div class="shead"><span></span>${closeBtn()}</div><p>This plant was removed.</p>`;
+  const t = today();
+  const occ = projectPlant(p, addDays(t, 420));
+  const nextOf = type => occ.filter(o => o.task.type === type).sort((a, b) => a.date < b.date ? -1 : 1)[0];
+  const feedHave = p.feed && (supplyMatch(p.feed.fromSupplies) || null);
+  const soilHave = p.soil && (supplyMatch(p.soil.fromSupplies) || null);
+  let html = `<div class="shead"><span class="muted small">${p.location === 'indoor' ? 'Indoor' : 'Outdoor'}</span>${closeBtn()}</div>
+  ${photoBlock(p, 'phero')}
+  <h1 class="page">${esc(p.name)}</h1>
+  ${p.species ? `<p class="sp" style="font-size:23px;margin:4px 0 0">${esc(p.species)}</p>` : ''}
+  <div class="tags">${p.spot ? `<span class="tag">${esc(p.spot)}</span>` : ''}${p.category ? `<span class="tag">${esc(p.category)}</span>` : ''}${p.commonName && p.commonName !== p.name ? `<span class="tag">${esc(p.commonName)}</span>` : ''}</div>
+  ${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
+  ${arr(p.warnings).map(w => `<p class="note">${esc(w)}</p>`).join('')}`;
+
+  if (pv.editing) {
+    const e = pv.edit;
+    html += `<h2 class="sec">Edit</h2>
+    <label class="f"><span>Name</span><input class="field" data-bind="name" value="${esc(e.name)}"></label>
+    <div>${seg('location', e.location, [['indoor','Indoor'],['outdoor','Outdoor']])}</div>
+    ${e.location === 'outdoor' ? `<div class="flabel" style="margin-top:16px">Does rain reach it?</div>${seg('exposed', e.exposed, [['yes','Yes'],['no','No, it’s under cover']])}` : ''}
+    <label class="f"><span>${e.location === 'indoor' ? 'Room' : 'Area'}</span><input class="field" data-bind="spot" value="${esc(e.spot)}" list="spots2"><datalist id="spots2">${spotList(e.location).map(s => `<option value="${esc(s)}">`).join('')}</datalist></label>
+    <h3 class="sec2">Care plan</h3>${planEditor(e.tasks)}
+    <div class="actions"><button class="btn" data-act="saveedit">Save changes</button><button class="btn ghost" data-act="canceledit">Cancel</button></div>`;
+    return html;
+  }
+
+  html += `<h2 class="sec"><span>Care</span><button class="link" data-act="edit">Edit plan</button></h2><ul class="rows">${plantTasks(p).map(tk => {
+    const n = tk.issue ? occ.filter(o => o.task.issue && o.task.issue.id === tk.issue.id).sort((a, b) => a.date < b.date ? -1 : 1)[0] : nextOf(tk.type);
+    const lastD = tk.issue ? tk.issue.lastTreated : (p.last || {})[tk.type];
+    const lastH = tk.issue ? null : arr(p.history).find(h => h.type === tk.type && h.date === lastD);
+    let s = cadence(tk) + '. ';
+    s += n ? (n.overdue ? `Overdue since ${fmtDay(n.origDate)}.` : `Next ${fmtRel(n.date)}.`) : 'Paused.';
+    if (lastD && tk.type !== 'refresh') s += ` Last done ${fmtDay(lastD).toLowerCase()}${lastH && lastH.by && lastH.by !== S.me ? ' by ' + ((S.names[lastH.by] || '').split(' ')[0] || 'someone else') : ''}.`;
+    if (n && n.held) s += ' On hold for forecast rain.';
+    else if (n && n.credited) s += ' Recent rain counted as watering.';
+    const stretch = n && n.stretched ? `<span class="how muted">Ideally every ${n.iv} days. Your care days stretch this a little; if it starts to droop, add a care day or move it somewhere less hot.</span>` : '';
+    const extra = n && n.extra ? `<span class="how muted">Needs more often than your care days allow, so it gets its own extra days.</span>` : '';
+    return `<li class="row top-al"><span class="txt" style="flex:1"><span class="t">${esc(tk.label)}</span><span class="s">${esc(s)}</span>${tk.how ? `<span class="how">${esc(tk.how)}</span>` : ''}${stretch}${extra}</span><button class="check" data-act="pdone" data-type="${tk.type}"${tk.issue ? ` data-issue="${tk.issue.id}"` : ''} aria-label="${DONE[tk.type]} now">${ico('check')}</button></li>`;
+  }).join('')}</ul>`;
+
+  const needs = [];
+  if (p.feed && p.feed.what) needs.push(`<div><dt>Feed</dt><dd>${esc(p.feed.what)}${feedHave ? `<br><span class="have">Use your ${esc(feedHave.name)}</span>` : S.inventory.length ? `<br><span class="muted small">Not in your supplies. It’s on the shopping list when you make one.</span>` : ''}</dd></div>`);
+  if (p.soil && p.soil.what) needs.push(`<div><dt>Soil</dt><dd>${esc(p.soil.what)}${soilHave ? `<br><span class="have">Use your ${esc(soilHave.name)}</span>` : ''}</dd></div>`);
+  if (p.pot) needs.push(`<div><dt>Pot</dt><dd>${esc(p.pot)}</dd></div>`);
+  if (p.light) needs.push(`<div><dt>Light</dt><dd>${esc(p.light)}</dd></div>`);
+  if (needs.length) html += `<h2 class="sec">What it needs</h2><dl class="need">${needs.join('')}</dl>`;
+  if (AI) html += pv.rebusy ? `<div class="busy"><span class="spin"></span>Rebuilding the plan<button class="link" data-act="stop" style="margin-left:auto">Stop</button></div>` : `<div class="actions"><button class="btn ghost small" data-act="recheck">Re-check with Claude</button></div>`;
+  if (pv.reerr) html += `<p class="note">${esc(pv.reerr)}</p>`;
+
+  html += issueSection(p);
+  html += `<h2 class="sec"><span>Photos</span><label class="link" style="cursor:pointer">Add photo<input class="vh" type="file" accept="image/*" capture="environment" data-file="plantphoto"></label></h2>`;
+  if (pv.photos === null) html += `<p class="muted">Loading photos</p>`;
+  else if (!pv.photos.length) html += `<p class="muted">Add a photo every month or so to see how it’s growing.</p>`;
+  else html += `<div class="pgrid">${pv.photos.map(ph => `<button data-act="cover" data-pid="${ph.id}" aria-label="Use as main photo"><img src="${ph.dataUrl}" alt="" class="${p.thumb && ph.thumbOf === p.thumb ? 'cover' : ''}"><span class="cap">${esc(fmtDay(ymd(new Date(ph.takenAt))))}</span></button>`).join('')}</div><p class="small muted">Tap a photo to make it the main one.</p>`;
+
+  const h = pv.health;
+  if (!AI) html += `<p class="small muted" style="margin-top:28px">Something wrong with it? Send a photo to Claude in a chat for a diagnosis, then log it above.</p>`;
+  if (AI) html += `<h2 class="sec">Something wrong?</h2>
+  <label class="f"><span>What are you seeing?</span><textarea class="field" data-hb="text" placeholder="For example yellow lower leaves, brown tips, white spots">${esc(h.text)}</textarea></label>
+  <div class="actions">${h.shot ? `<span class="shot"><img src="${h.shot.thumb}" alt="" style="width:64px;height:64px"><button class="x" data-act="rmhshot" aria-label="Remove photo">${ico('x')}</button></span>` : `<label class="btn ghost small" style="cursor:pointer">${ico('cam')}Photo of the problem<input class="vh" type="file" accept="image/*" capture="environment" data-file="healthshot"></label>`}
+  ${h.busy ? `<span class="busy" style="margin:0"><span class="spin"></span>Looking<button class="link" data-act="stop">Stop</button></span>` : `<button class="btn small" data-act="health"${(h.text.trim() || h.shot) ? '' : ' disabled'}>Check</button>`}</div>
+  ${h.error ? `<p class="note">${esc(h.error)}</p>` : ''}
+  ${h.answer ? `<div class="note pre">${esc(h.answer)}</div>${h.busy ? '' : `<p style="display:flex;gap:18px;flex-wrap:wrap"><button class="link" data-act="loghealth">Log as a problem</button><button class="link" data-act="savehealth">Save to notes</button></p>`}` : ''}`;
+
+  const notes = pv.notes === null ? (p.notes || '') : pv.notes;
+  html += `<h2 class="sec">Notes</h2><textarea class="field" data-pn="1" placeholder="Where you bought it, what worked, what didn’t">${esc(notes)}</textarea>
+  ${pv.notes !== null && pv.notes !== (p.notes || '') ? `<div class="actions"><button class="btn small" data-act="savenotes">Save notes</button></div>` : ''}
+  <div style="margin:44px 0 10px"><button class="danger" data-act="delplant">${pv.del ? 'Tap again to delete this plant and its photos' : 'Delete plant'}</button></div>`;
+  return html;
+}
+async function recheck() {
+  const p = S.plants.find(x => x.id === pv.id); if (!p) return;
+  const sample = await getSample();
+  if (!sample) { pv.reerr = 'Claude isn’t available in this view.'; renderSheet(); return; }
+  pv.rebusy = true; pv.reerr = ''; renderSheet();
+  aiCtl = new AbortController();
+  try {
+    const imgs = p.thumb && await canImages();
+    const opts = {signal:aiCtl.signal};
+    if (imgs) { const photos = pv.photos && pv.photos.length ? pv.photos.slice(0, 2).map(x => dataUrlToBlob(x.dataUrl)) : [dataUrlToBlob(p.thumb)]; opts.images = photos; }
+    const res = await sample.json(identifyPrompt({hasImages:!!imgs, loc:p.location, spot:p.spot, name:p.name, hint:p.species || p.commonName}), opts);
+    const r = normPlan(res);
+    const {alternatives, ...plan} = r;
+    await save(() => Store.putPlant({...p, ...plan, name:p.name, planAt:Date.now()}), 'Care plan updated');
+  } catch (e) { if (pv && e.code !== 'cancelled') pv.reerr = errCopy(e); }
+  finally { aiCtl = null; if (pv) { pv.rebusy = false; renderSheet(); } }
+}
+async function healthCheck() {
+  const p = S.plants.find(x => x.id === pv.id); if (!p) return;
+  const h = pv.health;
+  const sample = await getSample();
+  if (!sample) { h.error = 'Claude isn’t available in this view.'; renderSheet(); return; }
+  h.busy = true; h.error = ''; h.answer = ''; renderSheet();
+  aiCtl = new AbortController();
+  const imgs = h.shot && await canImages();
+  const lines = arr(p.tasks).map(t => `${t.label}: warm season every ${t.warmDays} days, cool season every ${t.coolDays} days; last done ${(p.last || {})[t.type] || 'unknown'}`).join('\n');
+  const prompt = `You are a plant doctor helping a home gardener.
+Plant: ${p.name} (${p.species || p.commonName || 'species unknown'}), ${p.location}, ${p.spot || 'spot not given'}.
+Current care plan:
+${lines}
+${ctxText()}
+Problems logged for this plant: ${S.issues.filter(i => i.plantId === p.id).map(i => `${i.name} (${i.status === 'resolved' ? 'cleared' : 'active'}${i.treatment ? ', treated with ' + i.treatment : ''})`).join('; ') || 'none'}.
+${imgs ? 'A photo of the problem is attached.' : ''}
+What the user sees: "${h.text.trim() || 'see photo'}"
+Reply in plain text, under 160 words. First line: the most likely cause. Then 2 to 4 short lines starting with "- " saying what to do now. Last line: whether the care plan should change, with new intervals in days if so. No headings, no bold.`;
+  try {
+    const opts = {signal:aiCtl.signal, cache:false, onText:({text}) => { if (pv) { pv.health.answer = text; const el = $('#sheet .note.pre'); if (el) el.textContent = text; else renderSheet(); } }};
+    if (imgs) opts.images = [dataUrlToBlob(h.shot.full)];
+    const {text} = await sample(prompt, opts);
+    if (pv) h.answer = text;
+  } catch (e) { if (pv && e.code !== 'cancelled') { h.error = errCopy(e); if (e.text) h.answer = e.text; } }
+  finally { aiCtl = null; if (pv) { h.busy = false; renderSheet(); } }
+}
+
+/* supplies */
+function openSupply(id) {
+  const it = id ? S.inventory.find(x => x.id === id) : null;
+  sup = it ? {...it, busy:false, error:''} : {id:null, name:'', kind:'feed', details:'', low:false, busy:false, error:''};
+  openSheet({kind:'supply'});
+}
+function renderSupply() {
+  return `<div class="shead"><h2>${sup.id ? 'Edit supply' : 'Add a supply'}</h2>${closeBtn()}</div>
+  ${!AI ? '' : sup.busy ? `<div class="busy"><span class="spin"></span>Reading the label<button class="link" data-act="stop" style="margin-left:auto">Stop</button></div>` : `<label class="btn ghost" style="cursor:pointer">${ico('cam')}Photograph the label<input class="vh" type="file" accept="image/*" capture="environment" data-file="scan"></label>`}
+  ${sup.error ? `<p class="note">${esc(sup.error)}</p>` : ''}
+  <div style="margin-top:18px">${seg('kind', sup.kind, Object.entries(KIND))}</div>
+  <label class="f"><span>Name</span><input class="field" data-bind="name" value="${esc(sup.name)}" placeholder="Brand and product"></label>
+  <label class="f"><span>Details (optional)</span><input class="field" data-bind="details" value="${esc(sup.details)}" placeholder="NPK, size, what it’s for"></label>
+  <div>${seg('low', sup.low ? 'yes' : 'no', [['no','Plenty left'],['yes','Running low']])}</div>
+  <div class="actions"><button class="btn wide" data-act="savesupply">${sup.id ? 'Save changes' : 'Add to my supplies'}</button></div>`;
+}
+async function scanLabel(file) {
+  const sample = await getSample();
+  if (!sample || !(await canImages())) { sup.error = 'Label reading isn’t available here. Type the name instead.'; renderSheet(); return; }
+  sup.busy = true; sup.error = ''; renderSheet();
+  aiCtl = new AbortController();
+  try {
+    const {full} = await processPhoto(file);
+    const r = await sample.json(`Read this product photo. It is a garden supply such as fertiliser, plant food, potting soil, potting mix, compost, a pot or a pesticide. Reply with only JSON: {"kind":"feed"|"soil"|"pot"|"other","name":string (brand and product name),"details":string (NPK ratio, what it is for, size if visible; max 120 characters)}`, {images:[dataUrlToBlob(full)], signal:aiCtl.signal, modelTier:'quick'});
+    if (!sup) return;
+    if (KIND[r.kind]) sup.kind = r.kind;
+    sup.name = str(r.name, 100) || sup.name; sup.details = str(r.details, 160) || sup.details;
+  } catch (e) { if (sup && e.code !== 'cancelled') sup.error = errCopy(e); }
+  finally { aiCtl = null; if (sup) { sup.busy = false; renderSheet(); } }
+}
+async function makeShopping() {
+  const sample = await getSample();
+  if (!sample) { S.shopErr = 'The shopping list needs Claude, which isn’t available in this view.'; render(); return; }
+  S.shopBusy = true; S.shopErr = ''; render();
+  const t = today();
+  const plants = S.plants.map(p => {
+    const rf = arr(p.tasks).find(x => x.type === 'refresh');
+    const rn = rf ? projectTask(p, rf, addDays(t, 120))[0] : null;
+    return `- ${p.name} (${p.species || p.commonName || '?'}), ${p.location}${p.spot ? ', ' + p.spot : ''}. Feed: ${(p.feed && p.feed.what) || 'not set'}. Soil: ${(p.soil && p.soil.what) || 'n/a'}. Pot: ${p.pot || 'n/a'}.${rn ? ` ${rf.label} due ${rn.date}.` : ''}`;
+  }).join('\n');
+  aiCtl = new AbortController();
+  try {
+    const r = await sample.json(`You are a practical garden-centre advisor. Build the shortest sensible shopping list for these plants. Use what the user already has wherever it can work, including reasonable substitutions (for example a balanced general feed instead of a specialist one). Prefer one or two products that cover many plants over one product per plant.
+${ctxText()}
+Plants:
+${plants}
+Supplies the user already has:
+${invText()}
+Reply with only JSON:
+{"useNow":[{"item":supply name exactly as listed,"for":[plant names],"how":short string}],
+"buy":[{"item":generic product description with NPK or spec and size,"why":short string,"for":[plant names],"priority":"now"|"soon"|"later"}],
+"tips":[up to 3 short strings]}
+"now" means needed within 2 weeks (feeding due, a supply running low, repotting due); "soon" within 2 months; "later" otherwise. Don't list things they already have unless running low.`, {signal:aiCtl.signal});
+    S.shopping = {at:Date.now(), count:S.plants.length, invCount:S.inventory.length,
+      useNow:arr(r.useNow).slice(0, 12).map(u => ({item:str(u.item, 100), for:arr(u.for).map(x => str(x, 60)).slice(0, 12), how:str(u.how, 200)})),
+      buy:arr(r.buy).slice(0, 12).map(b => ({item:str(b.item, 140), why:str(b.why, 200), for:arr(b.for).map(x => str(x, 60)).slice(0, 12), priority:['now','soon','later'].includes(b.priority) ? b.priority : 'soon', bought:false})).sort((a, b) => ['now','soon','later'].indexOf(a.priority) - ['now','soon','later'].indexOf(b.priority)),
+      tips:arr(r.tips).map(x => str(x, 200)).slice(0, 3)};
+    S.invChangedAt = 0;
+    await save(() => Store.putGarden());
+  } catch (e) { if (e.code !== 'cancelled') S.shopErr = errCopy(e); }
+  finally { aiCtl = null; S.shopBusy = false; render(); }
+}
+
+/* settings */
+function renderSettings() {
+  const s = setDraft;
+  return `<div class="shead"><h2>Settings</h2>${closeBtn()}</div>
+  <h1 class="page" style="font-size:32px">Care days</h1>
+  <p class="sub" style="margin-bottom:14px">Jobs are batched onto these days. A plant that wants water every 2 days and one that wants it every 3 both get done on the same days.</p>
+  <div class="days" role="group" aria-label="Care days">${[1,2,3,4,5,6,0].map(d => `<button type="button" data-act="careday" data-d="${d}" aria-pressed="${s.careDays.includes(d)}" aria-label="${WDL[d]}">${WD[d]}</button>`).join('')}</div>
+  <label class="f"><span>Reminder time</span><input class="field" type="time" data-bind="reminderTime" value="${esc(s.reminderTime)}" style="max-width:180px"></label>
+  <h3 class="sec2">Seasons</h3>
+  ${seg('hemisphere', s.hemisphere, [['south','Southern hemisphere'],['north','Northern hemisphere']])}
+  <label class="f"><span>Your climate and garden (helps the advice)</span><textarea class="field" data-bind="climate" placeholder="For example coastal, wet winters, hot windy summers, sandy soil, water restrictions">${esc(s.climate)}</textarea></label>
+  <h3 class="sec2">Pets or small children at home</h3>
+  ${seg('pets', s.pets ? 'yes' : 'no', [['no','No'],['yes','Yes, flag toxic plants']])}
+  <div class="actions" style="margin-top:28px"><button class="btn wide" data-act="savesettings"${s.careDays.length ? '' : ' disabled'}>Save settings</button></div>
+  ${s.careDays.length ? '' : '<p class="small muted">Pick at least one care day.</p>'}
+  <h3 class="sec2">Automatic weather</h3>
+  <p class="small">${s.lat != null ? 'On. Rain that falls near you is counted as watering, and forecast rain holds outdoor watering.' : 'Use your location to fetch real rainfall and forecasts. Rain is then counted as watering automatically, with no logging.'}</p>
+  <div class="actions" style="margin-top:10px"><button class="btn ghost small" data-act="geoloc">${s.lat != null ? 'Update location' : 'Use my location'}</button>${s.lat != null ? '<button class="link" data-act="geooff">Turn off</button>' : ''}</div>
+  <h3 class="sec2">Reminders</h3>
+  <p class="small">Add your upcoming care days to your phone’s calendar, each with an alert at your reminder time that lists the jobs.</p>
+  <button class="btn ghost small" data-act="ics">Add to phone calendar</button>
+  <h3 class="sec2" style="margin-top:28px">Backup</h3>
+  <p class="small">Download everything (plants, schedules, history, problems, supplies and photos) as one file. Keep it somewhere safe, like Google Drive or email it to yourself. Do it every month or so.</p>
+  <div class="actions" style="margin-top:10px"><button class="btn ghost small" data-act="backup">Download backup</button><label class="btn ghost small" style="cursor:pointer">Restore from a backup<input class="vh" type="file" accept=".json,application/json" data-file="restore"></label></div>
+  <p class="small muted">Restoring adds back anything missing and overwrites matching plants with the backup’s version. It doesn’t delete anything.</p>
+  <h3 class="sec2" style="margin-top:28px">On this phone</h3>
+  <p class="small muted">Tend saves everything on this phone only. Download a backup every month or so, and before you change or reset your phone.</p>`;
+}
+
+/* rain */
+function renderRain() {
+  const t = today();
+  const hold = S.rainHold && S.rainHold.until >= t ? S.rainHold.until : null;
+  const recent = S.rain.filter(r => diffDays(r.date, t) <= 14).sort((a, b) => a.date < b.date ? 1 : -1);
+  return `<div class="shead"><h2>Rain</h2>${closeBtn()}</div>
+  <h1 class="page" style="font-size:32px">It rained</h1>
+  <p class="sub">Rain counts as watering for outdoor plants it can reach. Soaking rain resets their watering; light rain pushes it back by about half.</p>
+  <div class="flabel" style="margin-top:18px">When</div>${seg('when', rd.when, [['0','Today'],['1','Yesterday'],['2','2 days ago']])}
+  <div class="flabel" style="margin-top:16px">How much</div>${seg('amount', rd.amount, [['light','Light, a drizzle'],['heavy','Soaking, 5 mm or more']])}
+  <div class="actions"><button class="btn" data-act="lograin">Log rain</button></div>
+  ${recent.length ? `<h3 class="sec2">Last two weeks</h3><ul class="rows">${recent.map(r => `<li class="row"><span class="txt" style="flex:1"><span class="t">${r.amount === 'heavy' ? 'Soaking rain' : 'Light rain'}</span><span class="s">${esc(fmtDay(r.date))}${r.mm != null ? `, ${r.mm} mm` : ''}${r.auto ? ', from weather data' : ''}</span></span><button class="x" data-act="delrain" data-id="${r.id}" aria-label="Remove">${ico('x')}</button></li>`).join('')}</ul>` : ''}
+  <h1 class="page" style="font-size:32px;margin-top:40px">Rain on the way</h1>
+  <p class="sub">Hold outdoor watering while you wait for forecast rain. If it doesn’t come, cancel the hold and the jobs come back.</p>
+  ${S.autoHold && S.autoHold.until >= t && S.holdIgnored !== S.autoHold.until ? `<p class="note">Forecast: ${S.autoHold.mm} mm by ${esc(fmtDay(S.autoHold.until).toLowerCase())}, so outdoor watering is held automatically.</p><div class="actions"><button class="btn ghost small" data-act="ignorehold">Ignore this forecast</button></div>` : ''}
+  ${hold ? `<p class="note">Holding until ${esc(fmtDay(hold).toLowerCase())}.</p><div class="actions"><button class="btn ghost" data-act="cancelhold">Cancel hold</button></div>`
+    : `<div class="flabel" style="margin-top:18px">Hold for</div>${seg('hold', rd.hold, [['1','Today'],['2','2 days'],['3','3 days']])}<div class="actions"><button class="btn" data-act="sethold">Hold outdoor watering</button></div>`}`;
+}
+
+/* calendar export */
+function icsEsc(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n'); }
+function fold(line) { const out = []; while (line.length > 73) { out.push(line.slice(0, 73)); line = ' ' + line.slice(73); } out.push(line); return out.join('\r\n'); }
+function buildICS() {
+  const t = today();
+  const occ = projectAll(addDays(t, 56));
+  const by = {}; occ.forEach(o => (by[o.date] = by[o.date] || []).push(o));
+  const [hh, mm] = (S.settings.reminderTime || '07:30').split(':').map(Number);
+  let em = mm + 30, eh = hh + Math.floor(em / 60); em %= 60; if (eh > 23) { eh = 23; em = 59; }
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Tend//Plant care//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Plant care'];
+  for (const date of Object.keys(by).sort()) {
+    const list = by[date]; const dd = date.replace(/-/g, '');
+    const counts = ORDER.map(tp => [tp, list.filter(o => o.task.type === tp)]).filter(([, g]) => g.length);
+    const summary = 'Plants: ' + counts.map(([tp, g]) => `${LABEL[tp].toLowerCase()} ${g.length}`).join(', ');
+    const desc = counts.map(([tp, g]) => `${GROUP[tp]}: ${g.map(o => o.plant.name + (o.plant.spot ? ` (${o.plant.spot})` : '')).join(', ')}`).join('\n');
+    L.push('BEGIN:VEVENT', `UID:${dd}-care@tend`, `DTSTAMP:${stamp}`, `DTSTART:${dd}T${pad(hh)}${pad(mm)}00`, `DTEND:${dd}T${pad(eh)}${pad(em)}00`,
+      fold(`SUMMARY:${icsEsc(summary)}`), fold(`DESCRIPTION:${icsEsc(desc)}`),
+      'BEGIN:VALARM', 'ACTION:DISPLAY', fold(`DESCRIPTION:${icsEsc(summary)}`), 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT');
+  }
+  L.push('END:VCALENDAR');
+  return {text:L.join('\r\n'), n:Object.keys(by).length};
+}
+async function saveFile(name, text, type) {
+  const blob = new Blob([text], {type});
+  try {
+    const file = new File([blob], name, {type});
+    if (navigator.canShare && navigator.canShare({files:[file]})) { await navigator.share({files:[file], title:name}); return true; }
+  } catch (e) { if (e && e.name === 'AbortError') return false; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  return true;
+}
+async function exportICS() {
+  if (!S.plants.length) { toast('Add a plant first.'); return; }
+  const {text, n} = buildICS();
+  if (await saveFile('plant-care.ics', text, 'text/calendar')) toast(`${n} care days exported. Open the file with your calendar app.`);
+}
+
+/* ---------- backup ---------- */
+async function exportBackup() {
+  const photos = Store.local.photos;
+  const data = {app:'tend', version:1, exportedAt:new Date().toISOString(), settings:S.settings, shopping:S.shopping, rain:S.rain, rainHold:S.rainHold, plants:S.plants, inventory:S.inventory, issues:S.issues, photos};
+  if (await saveFile(`tend-backup-${today()}.json`, JSON.stringify(data), 'application/json')) toast(`Backup ready: ${S.plants.length} plants, ${photos.length} photos`);
+}
+async function importBackup(file) {
+  let d;
+  try { d = JSON.parse(await file.text()); } catch (e) { toast('That file isn’t a Tend backup.'); return; }
+  if (!d || d.app !== 'tend' || !Array.isArray(d.plants)) { toast('That file isn’t a Tend backup.'); return; }
+  if (!S.canWrite) { toast('You can view this garden but not change it.'); return; }
+  toast('Restoring backup');
+  await save(async () => {
+    for (const p of d.plants) await Store.putPlant({...p});
+    for (const i of arr(d.inventory)) await Store.putInv({...i});
+    for (const i of arr(d.issues)) await Store.putIssue({...i});
+    for (const ph of arr(d.photos)) await Store.addPhoto({...ph});
+    if (d.settings) S.settings = {...DEFAULTS, ...d.settings, lat:S.settings.lat, lon:S.settings.lon};
+    if (d.shopping) S.shopping = d.shopping;
+    const seen = new Set(S.rain.map(r => r.id));
+    S.rain = [...S.rain, ...arr(d.rain).filter(r => !seen.has(r.id))].sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 40);
+    await Store.putGarden();
+  }, `Restored ${d.plants.length} plants`);
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, undo) {
+  const el = $('#toast');
+  el.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button type="button" id="undo">Undo</button>' : ''}`;
+  el.classList.toggle('solo', !undo);
+  el.hidden = false; clearTimeout(toastTimer);
+  if (undo) $('#undo').onclick = () => { el.hidden = true; undo(); };
+  toastTimer = setTimeout(() => { el.hidden = true; }, undo ? 5000 : 3200);
+}
+
+/* ---------- actions ---------- */
+async function markDone(ids, type, note) {
+  const t = today(); const before = [];
+  for (const id of ids) {
+    const p = S.plants.find(x => x.id === id); if (!p) continue;
+    before.push(p);
+    const np = {...p, last:{...(p.last || {}), [type]:t}, history:[{type, date:t, note:note || '', by:S.me || ''}, ...arr(p.history)].slice(0, 60)};
+    await save(() => Store.putPlant(np));
+  }
+  if (!before.length) return;
+  const label = note === 'rain' ? `Logged rain for ${before.length} ${before.length === 1 ? 'plant' : 'plants'}` : before.length === 1 ? `${DONE[type]} ${before[0].name}` : `${DONE[type]} ${before.length} plants`;
+  toast(label, async () => { for (const p of before) await save(() => Store.putPlant({...p})); });
+}
+async function markTreated(ids) {
+  const t = today(), before = [];
+  for (const id of ids) {
+    const i = S.issues.find(x => x.id === id); if (!i) continue;
+    before.push(i);
+    await save(() => Store.putIssue({...i, lastTreated:t, log:[{type:'treat', date:t, note:'Treated' + (i.treatment ? ': ' + i.treatment : ''), by:S.me || ''}, ...arr(i.log)].slice(0, 30)}));
+  }
+  if (!before.length) return;
+  toast(before.length === 1 ? `Treated ${before[0].name}` : `Treated ${before.length} problems`, async () => { for (const i of before) await save(() => Store.putIssue({...i})); });
+}
+function bindTarget() {
+  if (!sheet) return null;
+  if (sheet.kind === 'add') return draft;
+  if (sheet.kind === 'supply') return sup;
+  if (sheet.kind === 'settings') return setDraft;
+  if (sheet.kind === 'rain') return rd;
+  if (sheet.kind === 'plant' && pv && pv.issueForm) return pv.issueForm;
+  if (sheet.kind === 'plant' && pv && pv.editing) return pv.edit;
+  return null;
+}
+function onInput(e) {
+  const el = e.target;
+  if (el.dataset.bind) { const t = bindTarget(); if (t) t[el.dataset.bind] = el.value; if (sheet && sheet.kind === 'add' && draft.step === 1 && e.type === 'input') { const b = $('[data-act="identify"]'); if (b) b.disabled = !(draft.shots.length || draft.hint.trim() || draft.name.trim()); } }
+  if (el.dataset.tb) {
+    const tasks = sheet.kind === 'add' ? draft.result.tasks : pv.edit.tasks;
+    const [i, f] = el.dataset.tb.split(':'); const tk = tasks[+i]; if (!tk) return;
+    if (f === 'months') { const m = Math.max(1, num(el.value, 120)); tk.warmDays = tk.coolDays = m * 30; }
+    else tk[f] = num(el.value, 400);
+  }
+  if (el.dataset.up && pv) pv.upd[el.dataset.up] = el.value;
+  if (el.dataset.hb && pv) { pv.health[el.dataset.hb] = el.value; const b = $('[data-act="health"]'); if (b) b.disabled = !(el.value.trim() || pv.health.shot); }
+  if (el.dataset.pn && pv) {
+    const p = S.plants.find(x => x.id === pv.id);
+    const was = pv.notes !== null && pv.notes !== ((p && p.notes) || '');
+    pv.notes = el.value;
+    const now = pv.notes !== ((p && p.notes) || '');
+    if (was !== now && e.type === 'change') renderSheet();
+    else if (!was && now && !$('[data-act="savenotes"]')) { el.insertAdjacentHTML('afterend', `<div class="actions"><button class="btn small" data-act="savenotes">Save notes</button></div>`); }
+  }
+}
+document.addEventListener('input', onInput);
+document.addEventListener('change', onInput);
+
+document.addEventListener('change', async e => {
+  const el = e.target; if (!el.dataset.file || !el.files || !el.files[0]) return;
+  const file = el.files[0]; el.value = '';
+  try {
+    if (el.dataset.file === 'scan') { await scanLabel(file); return; }
+    if (el.dataset.file === 'restore') { await importBackup(file); return; }
+    const ph = await processPhoto(file);
+    if ((el.dataset.file === 'addshot' || el.dataset.file === 'reshot') && draft) {
+      if (draft.shots.length >= 3) draft.shots.pop();
+      draft.shots.push(ph);
+      if (!AI) { if (draft.step === 1) { draft.result = manualPlan(''); draft.step = 2; } renderSheet(); }
+      else if (!draft.busy) runIdentify(); else renderSheet();
+    }
+    if (el.dataset.file === 'healthshot' && pv) { pv.health.shot = ph; renderSheet(); }
+    if (el.dataset.file === 'issueshot' && pv && pv.issueForm) { pv.issueForm.thumb = ph.thumb; renderSheet(); }
+    if (el.dataset.file === 'plantphoto' && pv) {
+      const p = S.plants.find(x => x.id === pv.id); if (!p) return;
+      const rec = {id:newId(), plantId:p.id, dataUrl:ph.full, thumbOf:ph.thumb, takenAt:Date.now()};
+      pv.photos = [rec, ...(pv.photos || [])];
+      await save(async () => { await Store.addPhoto(rec); await Store.putPlant({...p, thumb:ph.thumb}); }, 'Photo added');
+    }
+  } catch (err) { toast('That photo couldn’t be opened. Try another.'); }
+});
+
+const ACT = {
+  nav:b => { S.view = b.dataset.view; render(); window.scrollTo(0, 0); },
+  settings:() => { setDraft = {...S.settings, careDays:[...careDays()]}; openSheet({kind:'settings'}); },
+  close:() => closeSheet(),
+  add:b => openAdd(b.dataset.loc || (S.view === 'outdoor' ? 'outdoor' : 'indoor')),
+  open:b => openPlant(b.dataset.id),
+  done:b => b.dataset.issue ? markTreated([b.dataset.issue]) : markDone([b.dataset.id], b.dataset.type),
+  doneall:b => {
+    const occ = projectAll(b.dataset.date).filter(o => o.date === b.dataset.date && o.task.type === b.dataset.type);
+    if (b.dataset.type === 'treat') markTreated([...new Set(occ.map(o => o.task.issue.id))]);
+    else markDone([...new Set(occ.map(o => o.plant.id))], b.dataset.type);
+  },
+  rainsheet:() => { rd = {when:'0', amount:'heavy', hold:'2'}; openSheet({kind:'rain'}); },
+  lograin:async () => {
+    const ev = {id:newId(), date:addDays(today(), -(+rd.when)), amount:rd.amount, by:S.me || ''};
+    const prev = S.rain.slice();
+    S.rain = [ev, ...S.rain].sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 40);
+    closeSheet();
+    await save(() => Store.putGarden());
+    toast(`${ev.amount === 'heavy' ? 'Soaking' : 'Light'} rain logged`, () => { S.rain = prev; save(() => Store.putGarden()); });
+  },
+  delrain:b => { S.rain = S.rain.filter(r => r.id !== b.dataset.id); save(() => Store.putGarden()); renderSheet(); },
+  sethold:async () => { S.rainHold = {until:addDays(today(), (+rd.hold) - 1), by:S.me || ''}; closeSheet(); await save(() => Store.putGarden(), 'Outdoor watering on hold'); },
+  cancelhold:async () => { S.rainHold = null; await save(() => Store.putGarden(), 'Hold cancelled'); renderSheet(); },
+  newissue:() => { pv.issueForm = {id:null, kind:'pest', name:'', notes:'', treatment:'', repeatDays:'0', treatedToday:'yes', thumb:'', error:''}; renderSheet(); },
+  editissue:b => { const i = S.issues.find(x => x.id === b.dataset.id); if (!i) return; pv.issueForm = {id:i.id, kind:i.kind || 'pest', name:i.name, notes:i.notes || '', treatment:i.treatment || '', repeatDays:String(num(i.repeatDays)), thumb:i.thumb || '', error:'', del:false}; renderSheet(); },
+  cancelissue:() => { pv.issueForm = null; renderSheet(); },
+  rmishot:() => { pv.issueForm.thumb = ''; renderSheet(); },
+  saveissue:async () => {
+    const f = pv.issueForm, t = today();
+    if (!f.name.trim()) { f.error = 'Name the problem first, even roughly.'; renderSheet(); return; }
+    const old = f.id ? S.issues.find(x => x.id === f.id) : null;
+    const it = old ? {...old} : {id:newId(), plantId:pv.id, startedAt:t, status:'active', by:S.me || '', log:[], lastTreated:f.treatedToday === 'yes' ? t : null};
+    Object.assign(it, {kind:f.kind, name:f.name.trim(), notes:f.notes.trim(), treatment:f.treatment.trim(), repeatDays:num(f.repeatDays, 90), thumb:f.thumb || ''});
+    pv.issueForm = null;
+    await save(() => Store.putIssue(it), old ? 'Problem updated' : 'Problem logged');
+    renderSheet();
+  },
+  delissue:async () => { const f = pv.issueForm; if (!f.del) { f.del = true; renderSheet(); return; } pv.issueForm = null; await save(() => Store.delIssue(f.id), 'Problem deleted'); renderSheet(); },
+  treated:b => markTreated([b.dataset.id]),
+  resolve:async b => { const i = S.issues.find(x => x.id === b.dataset.id); if (!i) return; await save(() => Store.putIssue({...i, status:'resolved', resolvedAt:today()})); toast(`${i.name} cleared`, () => save(() => Store.putIssue({...i}))); },
+  reopen:b => { const i = S.issues.find(x => x.id === b.dataset.id); if (i) save(() => Store.putIssue({...i, status:'active', resolvedAt:null})); },
+  toggleresolved:() => { pv.showResolved = !pv.showResolved; renderSheet(); },
+  addupd:async b => {
+    const i = S.issues.find(x => x.id === b.dataset.id); const note = (pv.upd[b.dataset.id] || '').trim(); if (!i || !note) return;
+    pv.upd[b.dataset.id] = '';
+    await save(() => Store.putIssue({...i, log:[{type:'note', date:today(), note, by:S.me || ''}, ...arr(i.log)].slice(0, 30)}));
+    renderSheet();
+  },
+  loghealth:() => {
+    const h = pv.health; const lines = h.answer.split('\n').map(x => x.trim()).filter(Boolean);
+    const name = (lines[0] || '').replace(/^(most )?likely cause:?\s*/i, '').replace(/[.]$/, '').slice(0, 80);
+    const treatment = lines.filter(l => l.startsWith('- ')).map(l => l.slice(2)).join('; ').slice(0, 240);
+    pv.issueForm = {id:null, kind:/fung|mildew|rot|blight|rust|spot|virus|bacter/i.test(h.answer) ? 'disease' : /mite|aphid|mealy|scale|thrip|snail|slug|caterpillar|whitefl|gnat|bug|insect|pest/i.test(h.answer) ? 'pest' : 'other', name, notes:h.text.trim(), treatment, repeatDays:'0', treatedToday:'no', thumb:h.shot ? h.shot.thumb : '', error:''};
+    renderSheet();
+    setTimeout(() => { const el = $('#sheet [data-act="saveissue"]'); if (el) el.scrollIntoView({block:'center'}); }, 30);
+  },
+  set:b => {
+    const t = bindTarget(); if (!t) return;
+    const k = b.dataset.k, v = b.dataset.v;
+    if (k === 'pets' || k === 'low') t[k] = v === 'yes'; else t[k] = v;
+    renderSheet();
+  },
+  careday:b => { const d = +b.dataset.d; const c = setDraft.careDays; const i = c.indexOf(d); if (i >= 0) c.splice(i, 1); else c.push(d); c.sort(); renderSheet(); },
+  savesettings:async () => { S.settings = {...S.settings, ...setDraft}; if (S.settings.lat == null) S.autoHold = null; closeSheet(); await save(() => Store.putGarden(), 'Settings saved'); weatherSync(true); },
+  identify:() => runIdentify(),
+  stop:() => { if (aiCtl) aiCtl.abort(); },
+  manual:() => { draft.result = manualPlan(draft.name || draft.hint); draft.step = 2; renderSheet(); $('#sheet').scrollTop = 0; },
+  alt:b => { draft.hint = b.dataset.v; runIdentify(); },
+  typename:() => { draft.typeName = true; renderSheet(); setTimeout(() => { const el = $('#sheet [data-bind="hint"]'); if (el) el.focus(); }, 30); },
+  addback:() => { draft.step = 1; renderSheet(); },
+  rmshot:b => { draft.shots.splice(+b.dataset.i, 1); renderSheet(); },
+  saveplant:() => savePlant(),
+  pdone:b => { if (b.dataset.issue) markTreated([b.dataset.issue]); else markDone([pv.id], b.dataset.type); },
+  edit:() => { const p = S.plants.find(x => x.id === pv.id); pv.editing = true; pv.edit = {name:p.name, location:p.location, exposed:p.exposed === false ? 'no' : 'yes', spot:p.spot || '', tasks:clean(arr(p.tasks))}; renderSheet(); },
+  canceledit:() => { pv.editing = false; renderSheet(); },
+  saveedit:async () => { const p = S.plants.find(x => x.id === pv.id); const e = pv.edit; pv.editing = false; await save(() => Store.putPlant({...p, name:e.name.trim() || p.name, location:e.location, exposed:e.location === 'outdoor' && e.exposed !== 'no', spot:e.spot.trim(), tasks:e.tasks, planAt:Date.now()}), 'Plan saved'); renderSheet(); },
+  recheck:() => recheck(),
+  cover:async b => { const p = S.plants.find(x => x.id === pv.id); const ph = (pv.photos || []).find(x => x.id === b.dataset.pid); if (!p || !ph) return; const th = ph.thumbOf || await shrinkSrc(ph.dataUrl, 360, 0.78); await save(() => Store.putPlant({...p, thumb:th}), 'Main photo updated'); },
+  rmhshot:() => { pv.health.shot = null; renderSheet(); },
+  health:() => healthCheck(),
+  savehealth:async () => { const p = S.plants.find(x => x.id === pv.id); const n = `${fmtDay(today())}: ${pv.health.text.trim()}\n${pv.health.answer.trim()}`; const notes = (p.notes ? p.notes + '\n\n' : '') + n; pv.notes = null; await save(() => Store.putPlant({...p, notes}), 'Saved to notes'); },
+  savenotes:async () => { const p = S.plants.find(x => x.id === pv.id); const notes = pv.notes; pv.notes = null; await save(() => Store.putPlant({...p, notes}), 'Notes saved'); },
+  delplant:async () => { if (!pv.del) { pv.del = true; renderSheet(); return; } const id = pv.id; const name = (S.plants.find(x => x.id === id) || {}).name; closeSheet(); await save(() => Store.delPlant(id), `${name || 'Plant'} deleted`); },
+  supply:b => openSupply(b.dataset.id),
+  savesupply:async () => {
+    if (!sup.name.trim()) { sup.error = 'Give it a name first.'; renderSheet(); return; }
+    const it = {id:sup.id || newId(), name:sup.name.trim(), kind:sup.kind, details:sup.details.trim(), low:!!sup.low};
+    closeSheet(); await save(() => Store.putInv(it), 'Supplies updated');
+  },
+  delsupply:b => { const it = S.inventory.find(x => x.id === b.dataset.id); if (!it) return; save(() => Store.delInv(it.id)); toast(`Removed ${it.name}`, () => save(() => Store.putInv({...it}))); },
+  shop:() => makeShopping(),
+  bought:b => { const it = S.shopping.buy[+b.dataset.i]; if (!it) return; it.bought = !it.bought; save(() => Store.putGarden()); },
+  tosupply:b => { const it = S.shopping.buy[+b.dataset.i]; if (!it) return; sup = {id:null, name:it.item, kind:/soil|mix|compost/i.test(it.item) ? 'soil' : /pot\b|pots|planter/i.test(it.item) ? 'pot' : /feed|fertili|food|npk/i.test(it.item) ? 'feed' : 'other', details:'', low:false, busy:false, error:''}; openSheet({kind:'supply'}); },
+  calday:b => { S.calSel = b.dataset.date; render(); },
+  calmove:b => { const m = S.calMonth || today().slice(0, 7); const [y, mo] = m.split('-').map(Number); const d = new Date(y, mo - 1 + (+b.dataset.n), 1); S.calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); },
+  ics:() => exportICS(),
+  backup:() => exportBackup(),
+  ignorehold:async () => { if (S.autoHold) S.holdIgnored = S.autoHold.until; await save(() => Store.putGarden(), 'Forecast ignored'); renderSheet(); },
+  geoloc:() => {
+    if (!navigator.geolocation) { toast('Location isn’t available on this phone.'); return; }
+    toast('Finding your location');
+    navigator.geolocation.getCurrentPosition(pos => {
+      if (!setDraft) return;
+      setDraft.lat = Math.round(pos.coords.latitude * 100) / 100; setDraft.lon = Math.round(pos.coords.longitude * 100) / 100;
+      renderSheet(); toast('Location found. Tap Save settings to turn it on.');
+    }, () => toast('Couldn’t get your location. Allow location access for Tend and try again.'), {timeout:15000, maximumAge:600000});
+  },
+  geooff:() => { setDraft.lat = null; setDraft.lon = null; renderSheet(); },
+};
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const fn = ACT[b.dataset.act]; if (fn) { e.preventDefault(); fn(b, e); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet) closeSheet(); });
+
+/* ---------- boot ---------- */
+render();
+Store.init();
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>
