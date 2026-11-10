@@ -45,7 +45,7 @@ img{max-width:100%}
 :focus-visible{outline:2px solid var(--leaf);outline-offset:2px;border-radius:6px}
 .app{max-width:620px;margin:0 auto;padding:16px 20px calc(104px + env(safe-area-inset-bottom,0px))}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:12px 0 20px}
-.hero{font-size:clamp(60px,18vw,104px);line-height:.86;font-weight:800;letter-spacing:-.05em;margin:0;font-variation-settings:"opsz" 96}
+.hero{font-size:clamp(50px,15vw,104px);line-height:.86;font-weight:800;letter-spacing:-.05em;margin:0;font-variation-settings:"opsz" 96}
 .page{font-size:44px;line-height:1;font-weight:750;letter-spacing:-.035em;margin:0}
 .sub{color:var(--mute);margin:10px 0 0;font-size:15.5px;max-width:46ch}
 .iconbtn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--line);flex:none}
@@ -150,6 +150,21 @@ textarea.field{min-height:96px;resize:vertical}
 .toast button{color:var(--paper);font-weight:700;text-decoration:underline;padding:4px 10px}
 .toast.solo{padding-right:18px}
 .toast[hidden]{display:none}
+.check.on{background:var(--leaf);box-shadow:none;color:var(--leaf-ink)}
+.row.isdone .t{color:var(--mute)}
+.sgroups{margin:20px 0 8px;border-top:1px solid var(--line)}
+.srow{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 2px;border-bottom:1px solid var(--line);font-size:21px;font-weight:650;letter-spacing:-.015em;text-align:left}
+.srow span{display:flex;align-items:center;gap:8px}
+.srow.ok{color:var(--leaf)}
+.sbody{padding:2px 0 14px;border-bottom:1px solid var(--line)}
+.sbody .rows{border-top:0}
+.status{margin:18px 0 6px;font-size:19px;font-weight:650;letter-spacing:-.01em}
+.status p{margin:4px 0;display:flex;align-items:center;gap:8px}
+.status .ok{color:var(--leaf)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 6px}
+.chip{padding:9px 16px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--ink);font-weight:600;font-size:14.5px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.cal .d.edited::after{content:"";position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--ink)}
 .spin{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp .8s linear infinite;flex:none}
 .busy{display:flex;align-items:center;gap:12px;margin:18px 0;font-weight:600}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -230,7 +245,8 @@ const ICON = {
   x:'<path d="M6 6l12 12M18 6 6 18"/>',
   plus:'<path d="M12 5v14M5 12h14"/>',
   left:'<path d="M15 5l-7 7 7 7"/>',
-  right:'<path d="M9 5l7 7-7 7"/>'
+  right:'<path d="M9 5l7 7-7 7"/>',
+  down:'<path d="M5 9l7 7 7-7"/>'
 };
 const ico = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICON[n]}</svg>`;
 function fmtDay(s) {
@@ -254,7 +270,7 @@ const initial = p => esc((p.name || '?').trim().charAt(0).toUpperCase());
 /* ---------- state ---------- */
 const AI = false; // standalone build: no Claude runtime, so no AI features
 const DEFAULTS = {careDays:[3,6], reminderTime:'07:30', hemisphere:'south', climate:'', pets:false, lat:null, lon:null};
-const S = {settings:{...DEFAULTS}, plants:[], inventory:[], issues:[], rain:[], rainHold:null, autoHold:null, holdIgnored:null, wx:null, migrated:false, names:{}, me:null, canWrite:true, shopping:null, view:'today', calMonth:null, calSel:null, loaded:false, shopBusy:false, shopErr:''};
+const S = {settings:{...DEFAULTS}, plants:[], inventory:[], issues:[], rain:[], openTypes:{}, showDone:{}, repeatFreq:{}, calEdits:{}, calMoveOpen:false, calMoveTo:'', rainHold:null, autoHold:null, holdIgnored:null, wx:null, migrated:false, names:{}, me:null, canWrite:true, shopping:null, view:'today', calMonth:null, calSel:null, loaded:false, shopBusy:false, shopErr:''};
 let sheet = null;      // {kind, ...}
 let draft = null;      // add-plant draft
 let pv = null;         // plant view state
@@ -336,13 +352,14 @@ const Store = {
       S.settings = {...DEFAULTS, ...(d.settings || {})}; S.shopping = d.shopping || null;
       S.plants = d.plants || []; S.inventory = d.inventory || []; S.issues = d.issues || [];
       S.rain = d.rain || []; S.rainHold = d.rainHold || null;
-      S.autoHold = d.autoHold || null; S.holdIgnored = d.holdIgnored || null; S.wx = d.wx || null;
+      S.autoHold = d.autoHold || null; S.holdIgnored = d.holdIgnored || null; S.wx = d.wx || null; S.calEdits = d.calEdits || {};
+      if (migrateSettings()) await this.saveLocal();
       this.local.photos = (await IDB.get('photos')) || [];
     } catch (e) { toast('Couldn’t open storage on this phone. Close and reopen Tend.'); }
   },
   async saveLocal() {
     try {
-      await IDB.set('garden', clean({settings:S.settings, shopping:S.shopping, plants:S.plants, inventory:S.inventory, issues:S.issues, rain:S.rain, rainHold:S.rainHold, autoHold:S.autoHold, holdIgnored:S.holdIgnored, wx:S.wx}));
+      await IDB.set('garden', clean({settings:S.settings, shopping:S.shopping, plants:S.plants, inventory:S.inventory, issues:S.issues, rain:S.rain, rainHold:S.rainHold, autoHold:S.autoHold, holdIgnored:S.holdIgnored, wx:S.wx, calEdits:S.calEdits}));
       if (this.photosDirty) { this.photosDirty = false; await IDB.set('photos', this.local.photos); }
     } catch (e) { toast('This phone is out of space. Remove a few photos.'); }
   },
@@ -424,7 +441,7 @@ async function save(fn, okMsg) {
 }
 
 /* ---------- schedule engine ---------- */
-function careDays() { const c = S.settings.careDays; return (c && c.length) ? c : [3,6]; }
+function careDays() { const c = S.settings.careDays; return (c && c.length) ? c : [6]; }
 function isCare(s) { return careDays().includes(dow(s)); }
 function nextCareOnOrAfter(s) { for (let i = 0; i < 8; i++) { const d = addDays(s, i); if (isCare(d)) return d; } return s; }
 function isWarm(s) {
@@ -478,7 +495,126 @@ function rainAdjust(last, iv) {
 }
 function cleanWd() { return careDays().reduce((a, b) => ((b + 6) % 7) > ((a + 6) % 7) ? b : a); }
 function cleanAnchor(y, m) { const wd = cleanWd(); for (let d = 1; d <= 7; d++) { const s = ymd(new Date(y, m, d)); if (dow(s) === wd) return s; } return ymd(new Date(y, m, 1)); }
+/* ---------- routine: one weekly care day ---------- */
+// Water every care day; feed and clean leaves on the first care day of the month. Any single day can be edited in the calendar.
+const ROUTINE = ['water','feed','clean'];
+const PAST = {water:'watered', feed:'fed', clean:'cleaned'};
+const FREQS = ['weekly','fortnightly','monthly','off'];
+function freqLabel(f, wd) { return f === 'weekly' ? 'Every week' : f === 'fortnightly' ? 'Every 2 weeks' : f === 'monthly' ? `First ${WDL[wd]} of the month` : 'Off'; }
+function freqText(x) { if (!x || x.freq === 'off') return 'Off'; return x.freq === 'weekly' ? `Every ${WDL[x.wd]}` : x.freq === 'fortnightly' ? `Every second ${WDL[x.wd]}` : `First ${WDL[x.wd]} of the month`; }
+function defaultRoutine(wd) { return {water:{wd, freq:'weekly'}, feed:{wd, freq:'monthly'}, clean:{wd, freq:'monthly'}}; }
+function migrateSettings() {
+  let ch = false;
+  if (!S.settings.routineV) { S.settings.careDays = [6]; S.settings.pauseFeed = true; S.settings.routineV = 2; ch = true; }
+  if (!Array.isArray(S.settings.routineHist) || !S.settings.routineHist.length) {
+    const c = S.settings.careDays; S.settings.routineHist = [{from:'2000-01-01', routine:defaultRoutine(c && c.length ? c[0] : 6)}]; ch = true;
+  }
+  return ch;
+}
+// The routine in force on a given day. Changes start from a date, so past days keep the routine they had.
+function routineAt(d) {
+  const h = arr(S.settings.routineHist); if (!h.length) return defaultRoutine(6);
+  let r = null; for (const e of h) if (e.from <= d && (!r || e.from >= r.from)) r = e;
+  return (r || h.reduce((a, b) => a.from < b.from ? a : b)).routine;
+}
+function latestRoutine() { const h = arr(S.settings.routineHist); return h.length ? h.reduce((a, b) => a.from > b.from ? a : b) : {from:'2000-01-01', routine:defaultRoutine(6)}; }
+function careWd() { const w = routineAt(today()).water; return w && w.freq !== 'off' ? w.wd : 6; }
+function routineTasksOn(d) {
+  const r = routineAt(d), out = [];
+  for (const tp of ROUTINE) {
+    const x = r[tp]; if (!x || x.freq === 'off' || dow(d) !== x.wd) continue;
+    if (x.freq === 'monthly' && parse(d).getDate() > 7) continue;
+    if (x.freq === 'fortnightly' && ((diffDays(x.anchor || d, d) % 14) + 14) % 14 !== 0) continue;
+    if (tp === 'feed' && S.settings.pauseFeed !== false && !isWarm(d)) continue;
+    out.push(tp);
+  }
+  return out;
+}
+function pushRoutine(from, r) {
+  for (const tp of ROUTINE) {
+    const x = r[tp]; if (!x || x.freq !== 'fortnightly') continue;
+    if (!x.anchor || dow(x.anchor) !== x.wd) { let a = from; while (dow(a) !== x.wd) a = addDays(a, 1); x.anchor = a; }
+  }
+  S.settings = {...S.settings, routineHist:[...arr(S.settings.routineHist).filter(e => e.from < from), {from, routine:r}], careDays:[r.water && r.water.freq !== 'off' ? r.water.wd : careWd()]};
+  // single-day changes that now match the routine are no longer needed
+  S.calEdits = {...(S.calEdits || {})};
+  Object.keys(S.calEdits).forEach(k => { if (k >= from) { const e = S.calEdits[k]; if (!e.skip && arr(e.tasks).length) { const base = routineTasksOn(k); if (e.tasks.length === base.length && e.tasks.every(x => base.includes(x))) delete S.calEdits[k]; } } });
+}
+function tasksOn(d) {
+  const e = (S.calEdits || {})[d];
+  if (e) { if (e.skip) return []; if (Array.isArray(e.tasks)) return e.tasks; }
+  return routineTasksOn(d);
+}
+function roundBefore(type, d) { for (let i = 1; i <= 120; i++) { const x = addDays(d, -i); if (tasksOn(x).includes(type)) return x; } return null; }
+function roundAfter(type, d) { for (let i = 1; i <= 120; i++) { const x = addDays(d, i); if (tasksOn(x).includes(type)) return x; } return null; }
+function roundOnOrBefore(type, d) { return tasksOn(d).includes(type) ? d : roundBefore(type, d); }
+function careDayOnOrBefore(d) { for (let i = 0; i <= 60; i++) { const x = addDays(d, -i); if (tasksOn(x).length) return x; } return null; }
+function careDayAfter(d) { for (let i = 1; i <= 120; i++) { const x = addDays(d, i); if (tasksOn(x).length) return x; } return null; }
+// A round "owns" the days halfway to its neighbours, so watering on Friday or Sunday counts for Saturday.
+function windowOf(type, D) {
+  const prev = roundBefore(type, D), next = roundAfter(type, D);
+  const lo = prev ? addDays(prev, Math.floor(diffDays(prev, D) / 2)) : addDays(D, -4);
+  const hi = next ? addDays(D, Math.floor(diffDays(D, next) / 2)) : addDays(D, 7);
+  return {lo, hi};
+}
+function routineTask(p, type) { return arr(p.tasks).find(t => t.type === type); }
+function doneDates(p, type) {
+  const out = arr(p.history).filter(h => h.type === type).map(h => h.date);
+  const l = (p.last || {})[type]; if (l) out.push(l);
+  if (type === 'water' && getsRain(p)) S.rain.forEach(r => { if (r.amount === 'heavy') out.push(r.date); });
+  return out;
+}
+function lastDone(p, type) { const t = today(); return doneDates(p, type).filter(x => x <= t).sort().pop() || null; }
+// Watering in the days just before a round also covers it: water on Tuesday and that Saturday is already done.
+function doneRange(type, D) {
+  const {lo, hi} = windowOf(type, D), prev = roundBefore(type, D);
+  const early = prev ? Math.floor(diffDays(prev, D) * 0.6) : 4;
+  const lo2 = addDays(D, -early - 1);
+  return {lo:lo < lo2 ? lo : lo2, hi};
+}
+function done(p, type, D) { const {lo, hi} = doneRange(type, D); return doneDates(p, type).some(x => x > lo && x <= hi); }
+function monthIdx(s) { const x = parse(s); return x.getFullYear() * 12 + x.getMonth(); }
+function createdDay(p) { return p.createdAt ? ymd(new Date(p.createdAt)) : null; }
+function inRound(p, type, D) {
+  const tk = routineTask(p, type); if (!tk) return false;
+  const c = createdDay(p); if (c && windowOf(type, D).hi < c) return false;
+  if (type === 'clean') {
+    if (done(p, 'clean', D)) return true;
+    const m = Math.max(1, Math.round(num(tk.warmDays) / 30));
+    const {lo} = windowOf('clean', D);
+    const before = doneDates(p, 'clean').filter(x => x <= lo).sort().pop();
+    return !before || monthIdx(D) - monthIdx(before) >= m;
+  }
+  return true;
+}
+function skippedCount(p, type) {
+  const t = today(); let R = roundOnOrBefore(type, t), n = 0;
+  const c = createdDay(p);
+  for (let i = 0; R && i < 40; i++, R = roundBefore(type, R)) {
+    const w = windowOf(type, R);
+    if (w.hi >= t) continue;            // still open
+    if (c && w.hi < c) break;           // before the plant was added
+    if (!inRound(p, type, R)) continue;
+    if (done(p, type, R)) break;
+    n++;
+  }
+  return n;
+}
+function roundComplete(D) {
+  return tasksOn(D).filter(tp => ROUTINE.includes(tp)).every(tp => S.plants.every(p => !inRound(p, tp, D) || done(p, tp, D)));
+}
+function routineOcc(p, task, end) {
+  const t = today(), out = [], stop = end < addDays(t, 200) ? end : addDays(t, 200);
+  for (let d = t; d <= stop; d = addDays(d, 1)) {
+    if (!tasksOn(d).includes(task.type) || !inRound(p, task.type, d) || done(p, task.type, d)) continue;
+    out.push({plant:p, task, date:d, origDate:d, overdue:false, extra:false, stretched:false, iv:intervalAt(task, d) || 7, held:false});
+  }
+  return out;
+}
+function agoText(d) { const n = diffDays(d, today()); return n <= 0 ? 'today' : n === 1 ? 'yesterday' : `${n} days ago`; }
+
 function projectTask(plant, task, end) {
+  if (ROUTINE.includes(task.type) && !task.issue) return routineOcc(plant, task, end);
   const out = [], t = today();
   let last = task.issue ? (task.issue.lastTreated || null) : ((plant.last || {})[task.type] || null);
   let credited = false;
@@ -669,14 +805,28 @@ function ringSVG(frac, overdue) {
   const f = Math.max(0, Math.min(1, frac));
   return `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="none" stroke="var(--line)" stroke-width="2.5"/>${overdue ? `<circle cx="50" cy="50" r="47" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="2 4"/>` : `<circle class="arc" cx="50" cy="50" r="47" fill="none" stroke="var(--leaf)" stroke-width="3.5" stroke-linecap="round" pathLength="100" stroke-dasharray="${(f * 100).toFixed(1)} 100"/>`}</svg>`;
 }
+function careState(p) {
+  const t = today(), items = [];
+  for (const tp of ROUTINE) {
+    if (!routineTask(p, tp)) continue;
+    const R = roundOnOrBefore(tp, t);
+    if (!R || diffDays(R, t) > 35 || !inRound(p, tp, R)) continue;
+    items.push({tp, done:done(p, tp, R)});
+  }
+  return items;
+}
 function ringFor(p) {
-  const tk = arr(p.tasks).find(x => x.type === 'water');
-  if (!tk) return ringSVG(1, false);
-  const o = projectTask(p, tk, addDays(today(), 120))[0];
-  if (!o) return ringSVG(1, false);
-  if (o.overdue) return ringSVG(0, true);
-  const iv = o.iv || 7;
-  return ringSVG(diffDays(today(), o.date) / iv, false);
+  const items = careState(p), n = items.length;
+  if (!n) return ringSVG(1, false);
+  const seg = 100 / n, gap = n > 1 ? 3 : 0;
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">${items.map((it, i) => `<circle cx="50" cy="50" r="47" fill="none" stroke="${it.done ? 'var(--leaf)' : 'var(--line)'}" stroke-width="${it.done ? 3.5 : 2.5}" pathLength="100" stroke-dasharray="${(seg - gap).toFixed(2)} ${(100 - seg + gap).toFixed(2)}" stroke-dashoffset="${(-i * seg).toFixed(2)}"/>`).join('')}</svg>`;
+}
+function careSummary(p) {
+  const todo = careState(p).filter(x => !x.done).map(x => x.tp);
+  if (!todo.length) return {ok:true, text:'All cared for'};
+  const words = {water:'water', feed:'feed', clean:'leaf clean'};
+  const w = todo.map(x => words[x]);
+  return {ok:false, text:'Needs ' + (w.length > 1 ? w.slice(0, -1).join(', ') + ' and ' + w[w.length - 1] : w[0])};
 }
 function photoBlock(p, cls = '') {
   return `<span class="ringwrap ${cls}">${ringFor(p)}${p.thumb ? `<img src="${p.thumb}" alt="">` : `<span class="ph">${initial(p)}</span>`}</span>`;
@@ -697,35 +847,64 @@ function rowHTML(o) {
   if (o.extra) bits.push('extra day, needs more than your care days');
   return `<li class="row"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${bits.join(', ')}</span>${feedLine}</span></button><button class="check" data-act="done" data-id="${p.id}" data-type="${tk.type}"${tk.issue ? ` data-issue="${tk.issue.id}"` : ''} aria-label="${DONE[tk.type]} ${esc(p.name)}">${ico('check')}</button></li>`;
 }
+function checkRow(p, tp, D) {
+  const isDone = done(p, tp, D), l = lastDone(p, tp), sk = skippedCount(p, tp);
+  const bits = [esc(p.spot || (p.location === 'indoor' ? 'Indoor' : 'Outdoor'))];
+  bits.push(l ? `${PAST[tp]} ${agoText(l)}` : `not ${PAST[tp]} yet`);
+  if (sk && !isDone) bits.push(`skipped ${sk} ${sk === 1 ? 'time' : 'times'}`);
+  let extra = '';
+  if (!isDone && tp === 'water' && l) {
+    const iv = intervalAt(routineTask(p, 'water'), D);
+    if (iv >= 10 && diffDays(l, D) < iv * 0.7) extra = `<span class="how muted">Probably doesn’t need it yet; likes water about every ${iv} days.</span>`;
+  }
+  if (!isDone && tp === 'feed' && p.feed && p.feed.what) extra = `<span class="how">${esc(p.feed.what)}</span>`;
+  return `<li class="row${isDone ? ' isdone' : ''}"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${bits.join(', ')}</span>${extra}</span></button><button class="check${isDone ? ' on' : ''}" data-act="tick" data-id="${p.id}" data-type="${tp}" data-round="${D}" aria-pressed="${isDone}" aria-label="${isDone ? 'Undo' : DONE[tp]} ${esc(p.name)}">${ico('check')}</button></li>`;
+}
 function renderToday() {
   const t = today();
   if (!S.plants.length) {
-    return head('Tend', 'Photograph a plant and Tend works out what it is, what it needs and when, then batches the jobs onto the days you choose.', true) +
-      `<div class="actions"><button class="btn" data-act="add" data-loc="indoor">${ico('cam')}Add an indoor plant</button><button class="btn ghost" data-act="add" data-loc="outdoor">Add an outdoor plant</button></div>
-       <p class="sub">Your care days are ${careDays().map(d => WDL[d]).join(' and ')}. Change them in settings.</p>`;
+    return head('Tend', 'Add your plants, then tick them off on your care day.', true) +
+      `<div class="actions"><button class="btn" data-act="add" data-loc="indoor">${ico('cam')}Add an indoor plant</button><button class="btn ghost" data-act="add" data-loc="outdoor">Add an outdoor plant</button></div>`;
   }
-  const occ = projectAll(addDays(t, 70));
-  if (!occ.length) return head('All clear', 'Nothing is scheduled in the next ten weeks.', true) + weatherBlock();
-  const hasNow = occ.some(o => o.date <= t);
-  const focus = hasNow ? t : occ.reduce((m, o) => o.date < m ? o.date : m, occ[0].date);
-  const list = occ.filter(o => o.date === focus);
-  const doneToday = S.plants.reduce((n, p) => n + arr(p.history).filter(h => h.date === t).length, 0);
-  const jobs = n => `${n} ${n === 1 ? 'job' : 'jobs'}`;
-  let html = focus === t
-    ? head('Today', `${longDate(t)}. ${jobs(list.length)}${isCare(t) ? '' : ', catching up'}.`, true)
-    : head(WDL[dow(focus)], `Next care day, ${longDate(focus)}. ${jobs(list.length)}. Nothing is due before then.`, true);
+  const cur = careDayOnOrBefore(t);
+  let focus = null, covered = [];
+  if (cur && (cur === t || (!roundComplete(cur) && diffDays(cur, t) <= 3))) focus = cur;
+  else {
+    let d = careDayAfter(addDays(t, -1));
+    for (let i = 0; d && i < 10 && roundComplete(d); i++) { covered.push(d); d = careDayAfter(d); }
+    focus = d || careDayAfter(addDays(t, -1));
+  }
+  if (!focus) return head('All clear', 'No care days planned. Add one in the calendar.', true) + weatherBlock();
+  const fd = parse(focus);
+  const types = ORDER.filter(tp => ROUTINE.includes(tp) && tasksOn(focus).includes(tp));
+  const groups = types.map(tp => { const ps = S.plants.filter(p => inRound(p, tp, focus)).sort((a, b) => (done(a, tp, focus) - done(b, tp, focus)) || a.name.localeCompare(b.name)); return {tp, ps, n:ps.filter(p => done(p, tp, focus)).length}; }).filter(g => g.ps.length);
+  const NEED = {water:'watering', feed:'feeding', clean:'leaf cleaning'};
+  const hero = focus === t ? 'Today' : WDL[fd.getDay()];
+  const sub = focus === t ? `${longDate(t)}.` : focus < t ? `Last care day, ${longDate(focus)}.` : `Next care day, ${longDate(focus)}. You can tick things off early.`;
+  let html = head(hero, sub, true);
+  if (covered.length) html += `<p class="note">${covered.map(d => `${WDL[dow(d)]} ${longDate(d)}`).join(' and ')} ${covered.length === 1 ? 'is' : 'are'} already covered by what you’ve done this week.</p>`;
+  if (S.openFor !== focus) { S.openFor = focus; S.openTypes = {}; S.showDone = {}; }
+  html += `<div class="sgroups">${groups.map(g => {
+    const pending = g.ps.filter(p => !done(p, g.tp, focus)), dn = g.ps.filter(p => done(p, g.tp, focus));
+    const open = !!S.openTypes[g.tp];
+    const label = pending.length ? `${pending.length} ${pending.length === 1 ? 'needs' : 'need'} ${NEED[g.tp]}` : `${ico('check')}All ${g.ps.length} ${PAST[g.tp]}`;
+    let h = `<button class="srow${pending.length ? '' : ' ok'}" data-act="togglestat" data-type="${g.tp}" aria-expanded="${open}"><span>${label}</span>${ico(open ? 'down' : 'right')}</button>`;
+    if (open) {
+      h += `<div class="sbody">`;
+      if (pending.length) h += `<ul class="rows">${pending.map(p => checkRow(p, g.tp, focus)).join('')}</ul>${pending.length > 1 ? `<div class="actions" style="margin:12px 0 4px"><button class="btn small" data-act="tickall" data-type="${g.tp}" data-round="${focus}">Mark all ${pending.length} done</button></div>` : ''}`;
+      if (dn.length) h += S.showDone[g.tp] ? `<h3 class="sec2">Done</h3><ul class="rows">${dn.map(p => checkRow(p, g.tp, focus)).join('')}</ul><p><button class="link" data-act="toggledone" data-type="${g.tp}">Hide done</button></p>` : `<p><button class="link" data-act="toggledone" data-type="${g.tp}">Show ${dn.length} done</button></p>`;
+      h += `</div>`;
+    }
+    return h;
+  }).join('')}</div>`;
   html += weatherBlock();
-  if (focus !== t && doneToday) html += `<p class="note">${jobs(doneToday)} done today.</p>`;
-  for (const type of ORDER) {
-    const g = list.filter(o => o.task.type === type);
-    if (!g.length) continue;
-    g.sort((a, b) => (b.overdue - a.overdue) || a.plant.name.localeCompare(b.plant.name));
-    html += `<h2 class="sec"><span>${GROUP[type]}</span>${g.length > 1 ? `<button class="link" data-act="doneall" data-type="${type}" data-date="${focus}">Mark all done</button>` : ''}</h2><ul class="rows">${g.map(rowHTML).join('')}</ul>`;
-  }
-  const after = occ.filter(o => o.date > focus);
-  if (after.length) {
-    const nd = after.reduce((m, o) => o.date < m ? o.date : m, after[0].date);
-    html += `<p class="sub" style="margin-top:28px">After that: ${esc(fmtDay(nd))}, ${jobs(after.filter(o => o.date === nd).length)}.</p>`;
+  const other = projectAll(focus).filter(o => (!ROUTINE.includes(o.task.type) || o.task.issue) && o.date <= focus);
+  if (other.length) html += `<h2 class="sec">Also due</h2><ul class="rows">${other.map(rowHTML).join('')}</ul>`;
+  let nx = careDayAfter(focus);
+  for (let i = 0; nx && i < 10; i++) {
+    const need = tasksOn(nx).filter(tp => S.plants.some(p => inRound(p, tp, nx) && !done(p, tp, nx)));
+    if (need.length) { html += `<p class="sub" style="margin-top:28px">After that: ${esc(fmtDay(nx))}, ${need.map(x => LABEL[x].toLowerCase()).join(', ')}.</p>`; break; }
+    nx = careDayAfter(nx);
   }
   return html;
 }
@@ -744,7 +923,7 @@ function weatherBlock() {
 function renderPlants(loc) {
   const ps = S.plants.filter(p => p.location === loc).sort((a, b) => a.name.localeCompare(b.name));
   const title = loc === 'indoor' ? 'Indoor' : 'Outdoor';
-  let html = `<div class="top"><div><h1 class="page">${title}</h1><p class="sub">${ps.length ? `${ps.length} ${ps.length === 1 ? 'plant' : 'plants'}. The ring shows how much time is left before the next watering.` : ''}</p></div><button class="btn small" data-act="add" data-loc="${loc}">${ico('plus')}Add</button></div>`;
+  let html = `<div class="top"><div><h1 class="page">${title}</h1><p class="sub">${ps.length ? `${ps.length} ${ps.length === 1 ? 'plant' : 'plants'}. The ring fills as this week’s watering, feeding and leaf cleaning get done.` : ''}</p></div><button class="btn small" data-act="add" data-loc="${loc}">${ico('plus')}Add</button></div>`;
   if (!ps.length) {
     return html + `<div class="empty"><p class="page">No ${loc} plants yet.</p><p class="sub">${loc === 'indoor' ? 'Take a photo of a pot plant to add it.' : 'Add trees, beds, pots on the patio and your lawn. A photo of each is enough.'}</p><div class="actions"><button class="btn" data-act="add" data-loc="${loc}">${ico('cam')}Take a photo</button></div></div>`;
   }
@@ -757,10 +936,9 @@ function renderPlants(loc) {
   return html;
 }
 function tileHTML(p) {
-  const n = nextFor(p), t = today();
-  const due = n && n.date <= t;
   const act = S.issues.filter(i => i.plantId === p.id && i.status !== 'resolved');
-  return `<button class="tile" data-act="open" data-id="${p.id}">${photoBlock(p)}<span class="tn">${esc(p.name)}</span>${p.species ? `<span class="ts sp">${esc(p.species)}</span>` : ''}<span class="tx${due ? ' due' : ''}">${n ? `${esc(n.task.label)} ${n.overdue ? 'today, overdue' : fmtRel(n.date)}` : 'Nothing scheduled'}</span>${act.length ? `<span class="tx od">${act.length === 1 ? 'Problem: ' + esc(act[0].name) : act.length + ' problems'}</span>` : ''}</button>`;
+  const cs = careSummary(p), sk = skippedCount(p, 'water');
+  return `<button class="tile" data-act="open" data-id="${p.id}">${photoBlock(p)}<span class="tn">${esc(p.name)}</span>${p.species ? `<span class="ts sp">${esc(p.species)}</span>` : ''}<span class="tx${cs.ok ? ' due' : ''}">${cs.text}</span>${sk ? `<span class="tx">Skipped ${sk} ${sk === 1 ? 'watering' : 'waterings'}</span>` : ''}${act.length ? `<span class="tx od">${act.length === 1 ? 'Problem: ' + esc(act[0].name) : act.length + ' problems'}</span>` : ''}</button>`;
 }
 function renderCalendar() {
   const t = today();
@@ -771,41 +949,60 @@ function renderCalendar() {
   const monthEnd = ymd(new Date(y, mo, 0));
   const end = monthEnd > addDays(t, 70) ? addDays(monthEnd, 7) : addDays(t, 70);
   const occ = projectAll(end);
-  const by = {};
-  occ.forEach(o => (by[o.date] = by[o.date] || []).push(o));
+  const by = {}; occ.forEach(o => (by[o.date] = by[o.date] || []).push(o));
   const hist = {};
   S.plants.forEach(p => arr(p.history).forEach(h => (hist[h.date] = hist[h.date] || []).push({p, h})));
   S.issues.forEach(i => { const p = S.plants.find(x => x.id === i.plantId); if (p) arr(i.log).filter(l => l.type === 'treat').forEach(l => (hist[l.date] = hist[l.date] || []).push({p, h:{type:'treat', date:l.date, by:l.by, note:i.name}})); });
   const rainBy = {}; S.rain.forEach(r => (rainBy[r.date] = rainBy[r.date] || []).push(r));
   const sel = S.calSel || t;
+  const weeks = Math.ceil((diffDays(start, monthEnd) + 1) / 7);
   const cells = [];
   let d = start;
-  const weeks = Math.ceil((diffDays(start, monthEnd) + 1) / 7);
   for (let i = 0; i < weeks * 7; i++, d = addDays(d, 1)) {
     const inM = d.slice(0, 7) === m;
-    const list = d >= t ? (by[d] || []) : [];
-    const past = d < t ? (hist[d] || []) : [];
-    const types = new Set([...list.map(o => o.task.type), ...past.map(x => x.h.type)]);
+    const types = new Set(d >= t ? [...tasksOn(d), ...(by[d] || []).map(o => o.task.type)] : (hist[d] || []).map(x => x.h.type));
     const dots = [...types].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b)).slice(0, 3)
       .map(tp => `<span class="dot ${tp === 'water' ? 'water' : tp === 'feed' ? 'feed' : 'other'}${d < t ? ' past' : ''}"></span>`).join('');
-    cells.push(`<button class="d${inM ? '' : ' out'}${isCare(d) ? ' care' : ''}${d === t ? ' today' : ''}${d === sel ? ' sel' : ''}" data-act="calday" data-date="${d}" aria-label="${esc(fmtDay(d))}${list.length ? ', ' + list.length + ' jobs' : ''}"><span>${parse(d).getDate()}</span><span class="dots">${dots}</span></button>`);
+    const care = tasksOn(d).length > 0, edited = !!(S.calEdits || {})[d];
+    cells.push(`<button class="d${inM ? '' : ' out'}${care ? ' care' : ''}${edited ? ' edited' : ''}${d === t ? ' today' : ''}${d === sel ? ' sel' : ''}" data-act="calday" data-date="${d}" aria-label="${esc(fmtDay(d))}${care ? ', care day' : ''}"><span>${parse(d).getDate()}</span><span class="dots">${dots}</span></button>`);
   }
-  let html = `<div class="top"><div><h1 class="page">Calendar</h1><p class="sub">Shaded days are your care days. Jobs are batched onto them.</p></div><button class="iconbtn" data-act="settings" aria-label="Settings">${ico('sliders')}</button></div>
+  let html = `<div class="top"><div><h1 class="page">Calendar</h1><p class="sub">Shaded days are care days. Tap any day to change its jobs, skip it or move it.</p></div><button class="iconbtn" data-act="settings" aria-label="Settings">${ico('sliders')}</button></div>
   <div class="monthbar"><button class="iconbtn" data-act="calmove" data-n="-1" aria-label="Previous month">${ico('left')}</button><strong>${MONL[mo - 1]} ${y}</strong><button class="iconbtn" data-act="calmove" data-n="1" aria-label="Next month">${ico('right')}</button></div>
   <div class="cal">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w => `<span class="wd">${w}</span>`).join('')}${cells.join('')}</div>
-  <div class="legend"><span><i class="dot water"></i>Water</span><span><i class="dot feed"></i>Feed</span><span><i class="dot other"></i>Repot, prune or mow</span></div>`;
+  <div class="legend"><span><i class="dot water"></i>Water</span><span><i class="dot feed"></i>Feed</span><span><i class="dot other"></i>Clean, repot or treat</span><span><i class="dot feed" style="width:5px;height:5px"></i>Changed day</span></div>`;
   html += `<h2 class="sec"><span>${esc(fmtDay(sel))}</span></h2>`;
   if (sel < t) {
     const past = hist[sel] || [], rains = rainBy[sel] || [];
-    html += rains.map(r => `<p class="note">${r.amount === 'heavy' ? 'Soaking rain' : 'Light rain'}${byWho(r.by)}.</p>`).join('');
-    html += past.length ? `<ul class="rows">${past.map(({p, h}) => `<li class="row"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${DONE[h.type]}${h.type === 'treat' ? ' for ' + esc(h.note) : ''}${byWho(h.by)}</span></span></button></li>`).join('')}</ul>` : (rains.length ? '' : `<p class="muted">Nothing was logged.</p>`);
-  } else {
-    const list = (by[sel] || []).sort((a, b) => ORDER.indexOf(a.task.type) - ORDER.indexOf(b.task.type));
-    html += list.length ? ORDER.map(tp => { const g = list.filter(o => o.task.type === tp); return g.length ? `<h3 class="sec2" style="color:var(--ink)">${GROUP[tp]} <span class="muted" style="font-weight:500">(${g.length})</span></h3><ul class="rows">${g.map(rowHTML).join('')}</ul>` : ''; }).join('') : `<p class="muted">Nothing planned.</p>`;
+    html += rains.map(r => `<p class="note">${r.amount === 'heavy' ? 'Soaking rain' : 'Light rain'}${r.mm != null ? `, ${r.mm} mm` : ''}.</p>`).join('');
+    html += past.length ? `<ul class="rows">${past.map(({p, h}) => `<li class="row"><button class="main" data-act="open" data-id="${p.id}">${p.thumb ? `<img class="thumb" src="${p.thumb}" alt="">` : `<span class="thumb">${initial(p)}</span>`}<span class="txt"><span class="t">${esc(p.name)}</span><span class="s">${DONE[h.type]}${h.type === 'treat' ? ' for ' + esc(h.note) : ''}</span></span></button></li>`).join('')}</ul>` : (rains.length ? '' : `<p class="muted">Nothing was logged.</p>`);
+    return html + icsNote();
   }
-  html += `<div class="note line" style="margin-top:28px"><strong>Reminders on your phone</strong><br>Add the next eight weeks of care days to your phone’s calendar, each with an alert listing the jobs. Do it again after adding plants.<div class="actions" style="margin-bottom:0"><button class="btn small" data-act="ics">Add to phone calendar</button></div></div>`;
-  return html;
+  const tks = tasksOn(sel), edited = !!(S.calEdits || {})[sel];
+  html += `<div class="flabel">Jobs on this day</div><div class="chips">${ROUTINE.map(tp => `<button type="button" class="chip" data-act="caltask" data-type="${tp}" aria-pressed="${tks.includes(tp)}">${LABEL[tp]}</button>`).join('')}</div>`;
+  html += `<div class="actions" style="margin-top:10px">${tks.length ? `<button class="btn ghost small" data-act="dayskip">Skip this day</button><button class="btn ghost small" data-act="daymoveopen">Move to another day</button>` : ''}${edited ? `<button class="link" data-act="dayreset">Back to the normal routine</button>` : ''}</div>`;
+  if (S.calMoveOpen && tks.length) html += `<div class="actions"><input class="field" type="date" data-cm="1" value="${esc(S.calMoveTo || '')}" min="${t}" style="max-width:210px"><button class="btn small" data-act="daymove">Move</button></div>`;
+  const ed = (S.calEdits || {})[sel], rtp = tks.filter(tp => ROUTINE.includes(tp));
+  if (ed && !ed.skip && rtp.length) {
+    html += `<div class="note line"><strong>Keep this going forward?</strong> Right now this change is just for ${esc(fmtDay(sel).toLowerCase())}.${rtp.map(tp => { const cur = routineAt(sel)[tp]; const f = S.repeatFreq[tp] || (cur && cur.freq !== 'off' ? cur.freq : 'weekly'); return `<div class="nums"><span style="min-width:64px;font-weight:650;color:var(--ink)">${LABEL[tp]}</span><select class="field" style="width:auto;min-height:42px" data-rf="${tp}">${['weekly','fortnightly','monthly'].map(v => `<option value="${v}"${f === v ? ' selected' : ''}>${freqLabel(v, dow(sel))}</option>`).join('')}</select></div>`; }).join('')}<div class="actions" style="margin-bottom:0"><button class="btn small" data-act="makeroutine">Make this my routine from now on</button></div></div>`;
+  }
+  const list = (by[sel] || []).sort((a, b) => ORDER.indexOf(a.task.type) - ORDER.indexOf(b.task.type));
+  html += list.length ? ORDER.map(tp => { const g = list.filter(o => o.task.type === tp); return g.length ? `<h3 class="sec2" style="color:var(--ink)">${GROUP[tp]} <span class="muted" style="font-weight:500">(${g.length})</span></h3><ul class="rows">${g.map(rowHTML).join('')}</ul>` : ''; }).join('')
+    : `<p class="muted">${tks.length ? 'Everything for this day is already done.' : 'No jobs on this day. Tap a job above to add one.'}</p>`;
+  return html + icsNote();
 }
+function icsNote() {
+  return `<div class="note line" style="margin-top:28px"><strong>Reminders on your phone</strong><br>Add the next eight weeks of care days to your phone’s calendar, each with an alert. Do it again after changing days.<div class="actions" style="margin-bottom:0"><button class="btn small" data-act="ics">Add to phone calendar</button></div></div>`;
+}
+function setEdit(d, tasks) {
+  const base = routineTasksOn(d);
+  const same = tasks.length === base.length && tasks.every(x => base.includes(x));
+  S.calEdits = {...(S.calEdits || {})};
+  if (same) delete S.calEdits[d];
+  else S.calEdits[d] = tasks.length ? {tasks:ORDER.filter(x => tasks.includes(x))} : {skip:true};
+  const cutoff = addDays(today(), -120);
+  Object.keys(S.calEdits).forEach(k => { if (k < cutoff) delete S.calEdits[k]; });
+}
+function persistCal(msg) { render(); save(() => Store.putGarden(), msg); }
 function shoppingStale() {
   const sh = S.shopping; if (!sh) return false;
   if (sh.count !== S.plants.length || sh.invCount !== S.inventory.length) return true;
@@ -1017,6 +1214,9 @@ function issueFormHTML() {
   ${f.id ? `<p><button class="danger" data-act="delissue">${f.del ? 'Tap again to delete this problem' : 'Delete problem'}</button></p>` : ''}</div>`;
 }
 function cadence(tk) {
+  if (tk.type === 'water' && !tk.issue) return freqText(routineAt(today()).water);
+  if (tk.type === 'feed' && !tk.issue) return freqText(routineAt(today()).feed) + (S.settings.pauseFeed !== false ? ', paused in the cool season' : '');
+  if (tk.type === 'clean' && !tk.issue) { const x = routineAt(today()).clean; const m = Math.max(1, Math.round(num(tk.warmDays) / 30)); return freqText(x) + (m > 1 && x && x.freq === 'monthly' ? `, every ${m === 2 ? 'second' : m + 'th'} time` : ''); }
   if (tk.type === 'refresh') return `Every ${Math.max(1, Math.round(tk.warmDays / 30))} months`;
   if (tk.type === 'clean') { const m = Math.max(1, Math.round(num(tk.warmDays) / 30)); return m === 1 ? `First ${WDL[cleanWd()]} of every month` : `First ${WDL[cleanWd()]} of every ${m === 2 ? 'second' : m + 'th'} month`; }
   const w = tk.warmDays, c = tk.coolDays, warm = isWarm(today());
@@ -1063,6 +1263,7 @@ function renderPlantSheet() {
     let s = cadence(tk) + '. ';
     s += n ? (n.overdue ? `Overdue since ${fmtDay(n.origDate)}.` : `Next ${fmtRel(n.date)}.`) : 'Paused.';
     if (lastD && tk.type !== 'refresh') s += ` Last done ${fmtDay(lastD).toLowerCase()}${lastH && lastH.by && lastH.by !== S.me ? ' by ' + ((S.names[lastH.by] || '').split(' ')[0] || 'someone else') : ''}.`;
+    if (ROUTINE.includes(tk.type) && !tk.issue) { const sk = skippedCount(p, tk.type); if (sk) s += ` Skipped ${sk} ${sk === 1 ? 'time' : 'times'}.`; if (tk.type === 'water') s += ` Ideally about every ${intervalAt(tk, t)} days.`; }
     if (n && n.held) s += ' On hold for forecast rain.';
     else if (n && n.credited) s += ' Recent rain counted as watering.';
     const stretch = n && n.stretched ? `<span class="how muted">Ideally every ${n.iv} days. Your care days stretch this a little; if it starts to droop, add a care day or move it somewhere less hot.</span>` : '';
@@ -1211,17 +1412,18 @@ Reply with only JSON:
 function renderSettings() {
   const s = setDraft;
   return `<div class="shead"><h2>Settings</h2>${closeBtn()}</div>
-  <h1 class="page" style="font-size:32px">Care days</h1>
-  <p class="sub" style="margin-bottom:14px">Jobs are batched onto these days. A plant that wants water every 2 days and one that wants it every 3 both get done on the same days.</p>
-  <div class="days" role="group" aria-label="Care days">${[1,2,3,4,5,6,0].map(d => `<button type="button" data-act="careday" data-d="${d}" aria-pressed="${s.careDays.includes(d)}" aria-label="${WDL[d]}">${WD[d]}</button>`).join('')}</div>
+  <h1 class="page" style="font-size:32px">Routine</h1>
+  <p class="sub" style="margin-bottom:6px">When each job comes round. Changes start today; past days keep the routine they had. You can also change single days in the calendar.</p>
+  <div class="plan">${ROUTINE.map(tp => { const x = s.routine[tp] || {wd:6, freq:'off'}; return `<div class="prow"><div class="pl">${LABEL[tp]}</div><div class="nums"><select class="field" style="width:auto;min-height:42px" data-rt="${tp}:freq">${FREQS.map(v => `<option value="${v}"${x.freq === v ? ' selected' : ''}>${v === 'monthly' ? 'First of the month' : freqLabel(v, x.wd)}</option>`).join('')}</select><span class="muted">on</span><select class="field" style="width:auto;min-height:42px" data-rt="${tp}:wd">${[1,2,3,4,5,6,0].map(d => `<option value="${d}"${x.wd === d ? ' selected' : ''}>${WDL[d]}</option>`).join('')}</select></div></div>`; }).join('')}</div>
+  <div class="flabel" style="margin-top:18px">Pause feeding in the cool season (${s.hemisphere === 'north' ? 'October to March' : 'April to September'})</div>
+  ${seg('pauseFeed', s.pauseFeed === false ? 'no' : 'yes', [['yes','Yes, recommended'],['no','No, feed all year']])}
   <label class="f"><span>Reminder time</span><input class="field" type="time" data-bind="reminderTime" value="${esc(s.reminderTime)}" style="max-width:180px"></label>
   <h3 class="sec2">Seasons</h3>
   ${seg('hemisphere', s.hemisphere, [['south','Southern hemisphere'],['north','Northern hemisphere']])}
   <label class="f"><span>Your climate and garden (helps the advice)</span><textarea class="field" data-bind="climate" placeholder="For example coastal, wet winters, hot windy summers, sandy soil, water restrictions">${esc(s.climate)}</textarea></label>
   <h3 class="sec2">Pets or small children at home</h3>
   ${seg('pets', s.pets ? 'yes' : 'no', [['no','No'],['yes','Yes, flag toxic plants']])}
-  <div class="actions" style="margin-top:28px"><button class="btn wide" data-act="savesettings"${s.careDays.length ? '' : ' disabled'}>Save settings</button></div>
-  ${s.careDays.length ? '' : '<p class="small muted">Pick at least one care day.</p>'}
+  <div class="actions" style="margin-top:28px"><button class="btn wide" data-act="savesettings">Save settings</button></div>
   <h3 class="sec2">Automatic weather</h3>
   <p class="small">${s.lat != null ? 'On. Rain that falls near you is counted as watering, and forecast rain holds outdoor watering.' : 'Use your location to fetch real rainfall and forecasts. Rain is then counted as watering automatically, with no logging.'}</p>
   <div class="actions" style="margin-top:10px"><button class="btn ghost small" data-act="geoloc">${s.lat != null ? 'Update location' : 'Use my location'}</button>${s.lat != null ? '<button class="link" data-act="geooff">Turn off</button>' : ''}</div>
@@ -1297,7 +1499,7 @@ async function exportICS() {
 /* ---------- backup ---------- */
 async function exportBackup() {
   const photos = Store.local.photos;
-  const data = {app:'tend', version:1, exportedAt:new Date().toISOString(), settings:S.settings, shopping:S.shopping, rain:S.rain, rainHold:S.rainHold, plants:S.plants, inventory:S.inventory, issues:S.issues, photos};
+  const data = {app:'tend', version:1, exportedAt:new Date().toISOString(), settings:S.settings, calEdits:S.calEdits, shopping:S.shopping, rain:S.rain, rainHold:S.rainHold, plants:S.plants, inventory:S.inventory, issues:S.issues, photos};
   if (await saveFile(`tend-backup-${today()}.json`, JSON.stringify(data), 'application/json')) toast(`Backup ready: ${S.plants.length} plants, ${photos.length} photos`);
 }
 async function importBackup(file) {
@@ -1312,6 +1514,8 @@ async function importBackup(file) {
     for (const i of arr(d.issues)) await Store.putIssue({...i});
     for (const ph of arr(d.photos)) await Store.addPhoto({...ph});
     if (d.settings) S.settings = {...DEFAULTS, ...d.settings, lat:S.settings.lat, lon:S.settings.lon};
+    migrateSettings();
+    S.calEdits = {...(d.calEdits || {}), ...S.calEdits};
     if (d.shopping) S.shopping = d.shopping;
     const seen = new Set(S.rain.map(r => r.id));
     S.rain = [...S.rain, ...arr(d.rain).filter(r => !seen.has(r.id))].sort((a, b) => a.date < b.date ? 1 : -1).slice(0, 40);
@@ -1372,6 +1576,9 @@ function onInput(e) {
     if (f === 'months') { const m = Math.max(1, num(el.value, 120)); tk.warmDays = tk.coolDays = m * 30; }
     else tk[f] = num(el.value, 400);
   }
+  if (el.dataset.cm) S.calMoveTo = el.value;
+  if (el.dataset.rf) S.repeatFreq[el.dataset.rf] = el.value;
+  if (el.dataset.rt && setDraft) { const [tp, f] = el.dataset.rt.split(':'); setDraft.routine[tp] = {...(setDraft.routine[tp] || {wd:6, freq:'off'}), [f]:f === 'wd' ? +el.value : el.value}; delete setDraft.routine[tp].anchor; }
   if (el.dataset.up && pv) pv.upd[el.dataset.up] = el.value;
   if (el.dataset.hb && pv) { pv.health[el.dataset.hb] = el.value; const b = $('[data-act="health"]'); if (b) b.disabled = !(el.value.trim() || pv.health.shot); }
   if (el.dataset.pn && pv) {
@@ -1412,7 +1619,7 @@ document.addEventListener('change', async e => {
 
 const ACT = {
   nav:b => { S.view = b.dataset.view; render(); window.scrollTo(0, 0); },
-  settings:() => { setDraft = {...S.settings, careDays:[...careDays()]}; openSheet({kind:'settings'}); },
+  settings:() => { setDraft = {...S.settings, careDays:[...careDays()], routine:clean(latestRoutine().routine)}; openSheet({kind:'settings'}); },
   close:() => closeSheet(),
   add:b => openAdd(b.dataset.loc || (S.view === 'outdoor' ? 'outdoor' : 'indoor')),
   open:b => openPlant(b.dataset.id),
@@ -1470,11 +1677,11 @@ const ACT = {
   set:b => {
     const t = bindTarget(); if (!t) return;
     const k = b.dataset.k, v = b.dataset.v;
-    if (k === 'pets' || k === 'low') t[k] = v === 'yes'; else t[k] = v;
+    if (k === 'pets' || k === 'low' || k === 'pauseFeed') t[k] = v === 'yes'; else t[k] = v;
     renderSheet();
   },
-  careday:b => { const d = +b.dataset.d; const c = setDraft.careDays; const i = c.indexOf(d); if (i >= 0) c.splice(i, 1); else c.push(d); c.sort(); renderSheet(); },
-  savesettings:async () => { S.settings = {...S.settings, ...setDraft}; if (S.settings.lat == null) S.autoHold = null; closeSheet(); await save(() => Store.putGarden(), 'Settings saved'); weatherSync(true); },
+  careday:b => { setDraft.careDays = [+b.dataset.d]; renderSheet(); },
+  savesettings:async () => { const {routine, ...rest} = setDraft; S.settings = {...S.settings, ...rest}; const lr = latestRoutine(); if (JSON.stringify(routine) !== JSON.stringify(lr.routine)) pushRoutine(lr.from > today() ? lr.from : today(), routine); if (S.settings.lat == null) S.autoHold = null; closeSheet(); await save(() => Store.putGarden(), 'Settings saved'); weatherSync(true); },
   identify:() => runIdentify(),
   stop:() => { if (aiCtl) aiCtl.abort(); },
   manual:() => { draft.result = manualPlan(draft.name || draft.hint); draft.step = 2; renderSheet(); $('#sheet').scrollTop = 0; },
@@ -1504,7 +1711,43 @@ const ACT = {
   shop:() => makeShopping(),
   bought:b => { const it = S.shopping.buy[+b.dataset.i]; if (!it) return; it.bought = !it.bought; save(() => Store.putGarden()); },
   tosupply:b => { const it = S.shopping.buy[+b.dataset.i]; if (!it) return; sup = {id:null, name:it.item, kind:/soil|mix|compost/i.test(it.item) ? 'soil' : /pot\b|pots|planter/i.test(it.item) ? 'pot' : /feed|fertili|food|npk/i.test(it.item) ? 'feed' : 'other', details:'', low:false, busy:false, error:''}; openSheet({kind:'supply'}); },
-  calday:b => { S.calSel = b.dataset.date; render(); },
+  calday:b => { S.calSel = b.dataset.date; S.calMoveOpen = false; S.calMoveTo = ''; S.repeatFreq = {}; render(); },
+  togglestat:b => { S.openTypes = {...S.openTypes, [b.dataset.type]:!S.openTypes[b.dataset.type]}; render(); },
+  toggledone:b => { S.showDone = {...S.showDone, [b.dataset.type]:!S.showDone[b.dataset.type]}; render(); },
+  makeroutine:() => {
+    const d = S.calSel || today();
+    const r = clean(routineAt(d));
+    tasksOn(d).filter(tp => ROUTINE.includes(tp)).forEach(tp => { const cur = r[tp]; const f = S.repeatFreq[tp] || (cur && cur.freq !== 'off' ? cur.freq : 'weekly'); r[tp] = {wd:dow(d), freq:f, anchor:d}; });
+    pushRoutine(d, r);
+    S.calEdits = {...S.calEdits}; delete S.calEdits[d]; S.repeatFreq = {};
+    persistCal(`Routine updated from ${fmtDay(d).toLowerCase()}`);
+  },
+  tick:async b => {
+    const p = S.plants.find(x => x.id === b.dataset.id); if (!p) return;
+    const tp = b.dataset.type, D = b.dataset.round;
+    if (!done(p, tp, D)) { await markDone([p.id], tp); return; }
+    const {lo, hi} = doneRange(tp, D);
+    const history = arr(p.history).filter(h => !(h.type === tp && h.date > lo && h.date <= hi));
+    const last = {...(p.last || {})};
+    const prev = history.filter(h => h.type === tp).map(h => h.date).sort().pop();
+    if (prev) last[tp] = prev; else if (last[tp] && last[tp] > lo) delete last[tp];
+    if (last[tp] && last[tp] > lo && last[tp] <= hi) delete last[tp];
+    await save(() => Store.putPlant({...p, last, history}));
+  },
+  tickall:b => { const tp = b.dataset.type, D = b.dataset.round; markDone(S.plants.filter(p => inRound(p, tp, D) && !done(p, tp, D)).map(p => p.id), tp); },
+  caltask:b => { const d = S.calSel || today(), tp = b.dataset.type, cur = tasksOn(d); setEdit(d, cur.includes(tp) ? cur.filter(x => x !== tp) : [...cur, tp]); persistCal(); },
+  dayskip:() => { setEdit(S.calSel || today(), []); S.calMoveOpen = false; persistCal('Day skipped'); },
+  dayreset:() => { const d = S.calSel || today(); S.calEdits = {...S.calEdits}; delete S.calEdits[d]; persistCal('Back to the normal routine'); },
+  daymoveopen:() => { S.calMoveOpen = !S.calMoveOpen; render(); },
+  daymove:() => {
+    const from = S.calSel || today(), to = S.calMoveTo;
+    if (!to || to === from) { toast('Pick a date first.'); return; }
+    if (to < today()) { toast('Pick a date from today onwards.'); return; }
+    const moving = tasksOn(from), there = tasksOn(to);
+    setEdit(from, []); setEdit(to, [...new Set([...there, ...moving])]);
+    S.calMoveOpen = false; S.calMoveTo = ''; S.calSel = to; S.calMonth = to.slice(0, 7);
+    persistCal(`Moved to ${fmtDay(to)}`);
+  },
   calmove:b => { const m = S.calMonth || today().slice(0, 7); const [y, mo] = m.split('-').map(Number); const d = new Date(y, mo - 1 + (+b.dataset.n), 1); S.calMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); },
   ics:() => exportICS(),
   backup:() => exportBackup(),
